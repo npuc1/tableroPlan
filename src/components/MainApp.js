@@ -17,7 +17,8 @@ import ReportConfirmationModal from './modals/ReportConfirmationModal';
 import NormativeModificationModal from './modals/NormativeModificationModal';
 import NoNormativeModal from './modals/NoNormativeModal';
 import Header from './display/HeaderApp';
-import Footer from './display/FooterApp'
+import Footer from './display/FooterApp';
+import LogoutButton from './display/LogoutButton';
 
 let instVisit = [0]
 
@@ -554,6 +555,8 @@ function MainApp() {
                   ))}
               </Dropdown.Menu>
             </Dropdown>
+            
+            <LogoutButton />
 
             <Header />
           </div>
