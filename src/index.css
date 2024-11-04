@@ -65,7 +65,8 @@ code {
 .header {
   background-color: white;
   padding: 1%;
-  font-family: 'Geomanist, sans-serif'
+  font-family: 'Geomanist, sans-serif';
+  padding-bottom: 30px;
 }
 
 .btn-custom {

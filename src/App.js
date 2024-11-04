@@ -6,13 +6,6 @@ import MainApp from './components/MainApp';
 function App() {
   const { isAuthenticated, isLoading, error, user } = useAuth0();
 
-  console.log('Auth Status:', {
-    isAuthenticated,
-    isLoading,
-    error: error ? error.message : null,
-    user
-  });
-
   if (error) {
     return <div>Authentication Error: {error.message}</div>;
   }
