@@ -1,13 +1,124 @@
+@import './fonts/fonts.css';
+
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  font-family: 'Geomanist', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: #f5f5f7 !important;
+}
+
+h1, h2, h3, h4, h5, h6, p, span, div {
+  font-family: 'Geomanist', sans-serif;
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+.title1 {
+  text-align: center;
+  color: #5C2335;
+  font-weight: bold;
+}
+
+.inst-name {
+  text-align: center;
+}
+
+.title2 {
+  text-align: center;
+  color: #755472;
+}
+
+.buttonContainer{
+  display: grid;
+  grid-template-columns: repeat(n, 1fr);
+  gap: 10px;
+}
+
+.instruccion{
+  text-align: center;
+  color: #7f7f7f;
+}
+
+.enlacesContainer{
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tablaReporte {
+  table-layout: fixed;
+}
+
+.linkBox {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  padding: 20px;
+}
+
+.header {
+  background-color: white;
+  padding: 1%;
+  font-family: 'Geomanist, sans-serif'
+}
+
+.btn-custom {
+  background: gray;
+  color: white;
+  border: 2px solid #fff;
+  border-radius: 3px;
+}
+
+.parent {
+  text-align: center;
+}
+
+.child {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.extra-pad {
+  padding-bottom: 4px;
+  padding-left: 2px;
+}
+
+.feedback-message {
+  margin-top: -0.5rem !important;
+}
+
+.checkboxbox {
+  display: grid;
+  gap: 6px;
+}
+
+.postAcuse {
+  width: 500px;
+  height: 150px;
+  
+  margin: auto;
+}
+
+.card-container {
+  width: 1100px;
+  margin: auto;
+  padding-bottom: 50px;
+}
+
+.disclaimer {
+  color: #D3D3D3;
+  font-size: 12px;
+  text-align: right;
+
+  padding-right: 15px;
+
+  position: absolute;
+  bottom: 0px;
+  right: 0;
 }

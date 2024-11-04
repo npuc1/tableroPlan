@@ -1,0 +1,31 @@
+@font-face {
+    font-family: 'Geomanist';
+    src: url('./Geomanist-Regular.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+  }
+  
+  @font-face {
+    font-family: 'Geomanist';
+    src: url('./Geomanist-Light.otf') format('opentype');
+    font-weight: 300;
+    font-style: normal;
+  }
+  
+  @font-face {
+    font-family: 'Geomanist';
+    src: url('./Geomanist-Bold.otf') format('opentype');
+    font-weight: bold;
+    font-style: normal;
+  }
+  
+  @font-face {
+    font-family: 'Geomanist';
+    src: url('./Geomanist-Ultra.otf') format('opentype');
+    font-weight: 900;
+    font-style: normal;
+  }
+  
+  body {
+    font-family: 'Geomanist', sans-serif;
+  }
