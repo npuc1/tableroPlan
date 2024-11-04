@@ -19,8 +19,6 @@ import NoNormativeModal from './modals/NoNormativeModal';
 import Header from './display/HeaderApp';
 import Footer from './display/FooterApp'
 
-// logo SNA y leyenda (preguntar rigel)
-
 let instVisit = [0]
 
 const renderTooltip = (props) => (
@@ -539,7 +537,7 @@ function MyApp() {
   if (states[selectedState].acuseEmitido === false) {
     return (
       <>
-        <div>
+        <div className="min-vh-100 w-100 position-relative">
           <div>
             <Dropdown>
               <Dropdown.Toggle variant='info' id='selectorEstados'>
@@ -908,19 +906,21 @@ function MyApp() {
   } else if (states[selectedState].acuseEmitido === true) {
     return (
       <>
-        <Header />
-        <div className='postAcuse'>
-          <Card>
-            <Card.Body>
-              <Card.Title></Card.Title>
-              <Card.Text><div>Su reporte ha sido enviado.</div>
-                <div style={{ 'paddingTop': '20px', 'display': 'flex', 'justifyContent': 'center', }}><Button
-                  variant='warning'>Descargar acuse</Button></div>
-              </Card.Text>
-            </Card.Body>
-          </Card>
+        <div className="min-vh-100 w-100 overflow-auto" style={{ 'backgroundColor': 'yellow', }}>
+          <Header />
+          <div className='postAcuse'>
+            <Card>
+              <Card.Body>
+                <Card.Title></Card.Title>
+                <Card.Text><div>Su reporte ha sido enviado.</div>
+                  <div style={{ 'paddingTop': '20px', 'display': 'flex', 'justifyContent': 'center', }}><Button
+                    variant='warning'>Descargar acuse</Button></div>
+                </Card.Text>
+              </Card.Body>
+            </Card>
+          </div>
+          <Footer />
         </div>
-        <Footer/>
       </>
     )
   }
