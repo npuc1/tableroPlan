@@ -906,7 +906,7 @@ function MyApp() {
   } else if (states[selectedState].acuseEmitido === true) {
     return (
       <>
-        <div className="min-vh-100 w-100 overflow-auto" style={{ 'backgroundColor': 'yellow', }}>
+        <div className="min-vh-100 w-100 overflow-auto">
           <Header />
           <div className='postAcuse'>
             <Card>
