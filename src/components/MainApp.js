@@ -250,18 +250,31 @@ function MainApp() {
 
       // verificar si existe algun cambio
       const anyChecked = actionCheckboxes.some(checkboxId => {
-        // usar el nuevo estado para el checbox que cambia
+        // usar el nuevo estado para el checkbox que cambia
         return checkboxId === criterio ?
           newCheckboxState :
           prevData[institution][checkboxId];
       });
+
+      if (!anyChecked) {
+        return {
+          ...prevData,
+          [institution]: {
+            ...prevData[institution],
+            [criterio]: newCheckboxState,
+            [`normName${action}`]: '',
+            [`normLink${action}`]: '',
+            [`editableText${action}`]: false
+          }
+        };
+      }
 
       return {
         ...prevData,
         [institution]: {
           ...prevData[institution],
           [criterio]: newCheckboxState,
-          [`editableText${action}`]: anyChecked  // propiedad editable si alguna está seleccionada
+          [`editableText${action}`]: true
         }
       };
     });
