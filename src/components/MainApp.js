@@ -12,7 +12,7 @@ import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import ToggleButton from 'react-bootstrap/ToggleButton';
 import ProgressBar from 'react-bootstrap/ProgressBar';
 import Fade from 'react-bootstrap/Fade';
-import { processCSV } from './stateDataLoader';
+import { processCSV } from './misc/stateDataLoader';
 import ReportConfirmationModal from './modals/ReportConfirmationModal';
 import NormativeModificationModal from './modals/NormativeModificationModal';
 import NoNormativeModal from './modals/NoNormativeModal';
@@ -20,6 +20,8 @@ import Header from './display/HeaderApp';
 import Footer from './display/FooterApp';
 import LogoutButton from './display/LogoutButton';
 import { useAuth0 } from '@auth0/auth0-react';
+import Checkboxes from './misc/Checkboxes';
+import { criterios } from './misc/ListaCriterios';
 
 let instVisit = [0]
 
@@ -28,35 +30,6 @@ const renderTooltip = (props) => (
     Para consultar las definiciones extendidas de las acciones y criterios, descarge la guía de usuario
   </Tooltip>
 );
-
-// creacion de array de objectos para checkboxes de criterios
-let criterios = Array.from(Array(12), () => ({ nombreCrit: '', accion: '', posicion: '' }))
-
-const nombresCriterios = [
-  "Presupuesto y cronograma",
-  "Montos máximos para excepciones",
-  "Registro previo de todos los procedimientos",
-  "Investigación de mercado obligatoria",
-  "Existencia de oferta de bienes y/o servicios",
-  "Existencia de proveedores",
-  "Precio de bienes y/o servicios",
-  "Medios consultados para la investigación",
-  "Justificación para la selección de empresas",
-  "Soporte documental",
-  "Utilización de fraccionamientos*",
-  "Incorporación de OIC y área jurídica*",
-
-]
-
-const acciones = [1, 1, 1, 2, 3, 3, 3, 3, 3, 3, 3, 3,];
-
-const posicion = ["1", "2", "3", "1", "1", "2", "3", "4", "5", "6", "7", "8",];
-
-criterios = criterios.map((criterio, index) => ({
-  nombreCrit: nombresCriterios[index],
-  accion: acciones[index],
-  posicion: posicion[index]
-}));
 
 function MainApp() {
   // otros
@@ -569,6 +542,7 @@ function MainApp() {
               {appMetadata && (
                 <div>
                   {appMetadata.estado && <p>{appMetadata.estado}</p>}
+                  {appMetadata.rol && <p>{appMetadata.rol}</p>}
                 </div>
               )}
             </div>
@@ -721,61 +695,31 @@ function MainApp() {
                       </tr>
                       <tr>
                         <td>
-                          <div className='checkboxbox'>
-                            {criterios
-                              .filter(criterio => criterio.accion === 1)
-                              .map((criterio) => {
-                                const checkboxId = `${criterio.accion}${criterio.posicion}`;
-                                return (
-                                  <Form.Check
-                                    key={checkboxId}
-                                    label={`${criterio.posicion}. ${criterio.nombreCrit}`}
-                                    id={checkboxId}
-                                    checked={formData[nameInst(currentInstIndex)]?.[checkboxId]}
-                                    disabled={!formData[nameInst(currentInstIndex)]?.editable}
-                                    onChange={(e) => handleCheckboxCChange(nameInst(currentInstIndex), e.target.id)}
-                                    isInvalid={validationErrors.checkboxes} />
-                                )
-                              })}
-                          </div>
+                          <Checkboxes
+                            accion="1"
+                            formData={formData}
+                            currentInstIndex={currentInstIndex}
+                            nameInst={nameInst}
+                            handleCheckboxCChange={handleCheckboxCChange}
+                            validationErrors={validationErrors} />
                         </td>
                         <td>
-                          <div className='checkboxbox'>
-                            {criterios
-                              .filter(criterio => criterio.accion === 2)
-                              .map((criterio) => {
-                                const checkboxId = `${criterio.accion}${criterio.posicion}`;
-                                return (
-                                  <Form.Check
-                                    key={checkboxId}
-                                    label={`${criterio.posicion}. ${criterio.nombreCrit}`}
-                                    id={checkboxId}
-                                    checked={formData[nameInst(currentInstIndex)]?.[checkboxId]}
-                                    disabled={!formData[nameInst(currentInstIndex)]?.editable}
-                                    onChange={(e) => handleCheckboxCChange(nameInst(currentInstIndex), e.target.id)}
-                                    isInvalid={validationErrors.checkboxes} />  // hace roja la etiqueta className={validationErrors.checkboxes ? 'text-danger' : ''}
-                                )
-                              })}
-                          </div>
+                          <Checkboxes
+                            accion="2"
+                            formData={formData}
+                            currentInstIndex={currentInstIndex}
+                            nameInst={nameInst}
+                            handleCheckboxCChange={handleCheckboxCChange}
+                            validationErrors={validationErrors} />
                         </td>
                         <td>
-                          <div className='checkboxbox'>
-                            {criterios
-                              .filter(criterio => criterio.accion === 3)
-                              .map((criterio) => {
-                                const checkboxId = `${criterio.accion}${criterio.posicion}`;
-                                return (
-                                  <Form.Check
-                                    key={checkboxId}
-                                    label={`${criterio.posicion}. ${criterio.nombreCrit}`}
-                                    id={checkboxId}
-                                    checked={formData[nameInst(currentInstIndex)]?.[checkboxId]}
-                                    disabled={!formData[nameInst(currentInstIndex)]?.editable}
-                                    onChange={(e) => handleCheckboxCChange(nameInst(currentInstIndex), e.target.id)}
-                                    isInvalid={validationErrors.checkboxes} />
-                                )
-                              })}
-                          </div>
+                          <Checkboxes
+                            accion="3"
+                            formData={formData}
+                            currentInstIndex={currentInstIndex}
+                            nameInst={nameInst}
+                            handleCheckboxCChange={handleCheckboxCChange}
+                            validationErrors={validationErrors} />
                         </td>
                       </tr>
                       <tr>
