@@ -102,7 +102,7 @@ code {
 .postAcuse {
   width: 500px;
   height: 150px;
-  
+  padding-top: 50px;
   margin: auto;
 }
 
@@ -122,4 +122,9 @@ code {
   position: absolute;
   bottom: 0;
   right: 0;
+}
+
+.dropdown-menu {
+  height: 300px;
+  overflow-y: scroll;
 }

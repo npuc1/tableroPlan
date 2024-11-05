@@ -3,8 +3,14 @@ import { BsCloudDownload } from 'react-icons/bs';
 import Button from 'react-bootstrap/Button';
 import { useAuth0 } from '@auth0/auth0-react';
 import LogoutButton from './LogoutButton';
+import Dropdown from 'react-bootstrap/Dropdown';
 
-const Header = () => {
+const Header = ({
+  appMetadata,
+  selectedState,
+  states,
+  handleStateSelect,
+}) => {
 
   const { isAuthenticated } = useAuth0();
 
@@ -41,16 +47,31 @@ const Header = () => {
           Acción 3: Homologación de normatividad
         </h5>
         <div className='linkBox'>
-        <Button
-          variant='secondary'
-          href='https://www.sna.org.mx/wp-content/uploads/2024/04/Plan-de-Accion-contrataciones-publicas_250324.pdf'
-          target='_blank'>
-          Plan de Acción <BsLink45Deg />
-        </Button>
-        <Button variant='secondary'>
-          Guía de usuario <BsCloudDownload />
-        </Button>
-      </div>
+          <Button
+            variant='secondary'
+            href='https://www.sna.org.mx/wp-content/uploads/2024/04/Plan-de-Accion-contrataciones-publicas_250324.pdf'
+            target='_blank'>
+            Plan de Acción <BsLink45Deg />
+          </Button>
+          <Button variant='secondary'>
+            Guía de usuario <BsCloudDownload />
+          </Button>
+          {(isAuthenticated && appMetadata.rol === "admin") && <Dropdown>
+            <Dropdown.Toggle variant='info' id='selectorEstados'>
+              {selectedState === 'default' ? 'Select State' : selectedState}
+            </Dropdown.Toggle>
+
+            <Dropdown.Menu>
+              {Object.keys(states)
+                .filter(state => state !== 'default')
+                .map(state => (
+                  <Dropdown.Item key={state} onClick={() => handleStateSelect(state)}>
+                    {state}
+                  </Dropdown.Item>
+                ))}
+            </Dropdown.Menu>
+          </Dropdown>}
+        </div>
       </div>
     </div>
   )

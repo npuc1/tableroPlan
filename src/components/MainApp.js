@@ -1,6 +1,5 @@
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
-import Dropdown from 'react-bootstrap/Dropdown';
 import React, { useState, useEffect, useCallback } from 'react';
 import Table from 'react-bootstrap/Table';
 import Modal from 'react-bootstrap/Modal';
@@ -546,7 +545,11 @@ function MainApp() {
       <>
         <div className="min-vh-100 w-100 position-relative">
           <div>
-            <Header />
+            <Header 
+            appMetadata={appMetadata}
+            selectedState={selectedState}
+            states={states}
+            handleStateSelect={handleStateSelect} />
           </div>
 
           <ReportConfirmationModal
@@ -791,27 +794,13 @@ function MainApp() {
           <div>
             {(appMetadata && appMetadata.rol === "admin") && (
               <div>
-                {appMetadata.estado && <p>Estado asignado: {appMetadata.estado}</p>}
+                {appMetadata.estado && <p>Estado seleccionado: {selectedState}</p>}
                 {appMetadata.rol && <p>Rol asignado: {appMetadata.rol}</p>}
+                {appMetadata.rol && <p>Usuario: {user.email}</p>}
               </div>
             )}
           </div>
           <Footer />
-          {appMetadata.rol === "admin" && <Dropdown>
-            <Dropdown.Toggle variant='info' id='selectorEstados'>
-              {selectedState === 'default' ? 'Select State' : selectedState}
-            </Dropdown.Toggle>
-
-            <Dropdown.Menu>
-              {Object.keys(states)
-                .filter(state => state !== 'default')
-                .map(state => (
-                  <Dropdown.Item key={state} onClick={() => handleStateSelect(state)}>
-                    {state}
-                  </Dropdown.Item>
-                ))}
-            </Dropdown.Menu>
-          </Dropdown>}
         </div>
       </>
     );
