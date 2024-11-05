@@ -547,7 +547,7 @@ function MainApp() {
       <>
         <div className="min-vh-100 w-100 position-relative">
           <div>
-            <Dropdown>
+            {appMetadata.rol === "admin" && <Dropdown>
               <Dropdown.Toggle variant='info' id='selectorEstados'>
                 {selectedState === 'default' ? 'Select State' : selectedState}
               </Dropdown.Toggle>
@@ -561,7 +561,7 @@ function MainApp() {
                     </Dropdown.Item>
                   ))}
               </Dropdown.Menu>
-            </Dropdown>
+            </Dropdown>}
 
             <LogoutButton />
 

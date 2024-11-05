@@ -11,9 +11,9 @@ Se deben agregar las credenciales generadas a través de la inicialización de u
 
 Los roles, así como los estados que pueden ser editados por cada usuario deben ser asignados directamente en el dashboard de 0Auth. De manera adicional, se tiene que agregar el siguiente trigger personalizado al post login para el retrieval de la información, antes de la emisión del token:
 
-exports.onExecutePostLogin = async (event, api) => {
+`exports.onExecutePostLogin = async (event, api) => {
   if (event.user.app_metadata) {
     api.idToken.setCustomClaim(`app_metadata`, event.user.app_metadata);
     api.accessToken.setCustomClaim(`app_metadata`, event.user.app_metadata);
   }
-};
+};`
