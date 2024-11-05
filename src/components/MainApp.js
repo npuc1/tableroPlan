@@ -18,7 +18,6 @@ import NormativeModificationModal from './modals/NormativeModificationModal';
 import NoNormativeModal from './modals/NoNormativeModal';
 import Header from './display/HeaderApp';
 import Footer from './display/FooterApp';
-import LogoutButton from './display/LogoutButton';
 import { useAuth0 } from '@auth0/auth0-react';
 import Checkboxes from './misc/Checkboxes';
 import { criterios } from './misc/ListaCriterios';
@@ -52,7 +51,7 @@ function MainApp() {
   });
 
   // keep track estado seleccionado
-  const [selectedState, setSelectedState] = useState('default'); // formato de un valor en caracter, estadp default para prevenir error en initial load
+  const [selectedState, setSelectedState] = useState('default'); // formato de un valor en caracter, estado default para prevenir error en initial load
 
   // guardar instituciones del estado seleccionado
   const [institutions, setInstitutions] = useState([]); // formato de array para instituciones
@@ -80,7 +79,7 @@ function MainApp() {
 
         if (Object.keys(statesData).length > 0) {
           setStates(statesData);
-          const firstState = Object.keys(statesData)[0];
+          const firstState = appMetadata.estado;
           setSelectedState(firstState);
           setInstitutions(statesData[firstState].institutions || []);
         }
@@ -93,7 +92,7 @@ function MainApp() {
     };
 
     loadInitialData();
-  }, []);
+  }, [appMetadata.estado]);
 
   const getInstitutions = useCallback(() => {
     if (!selectedState || !states[selectedState]) {
@@ -191,7 +190,7 @@ function MainApp() {
   }, [selectedState, states]);
 
 
-  // handler para seleccion de estados, aunque es redundante puede ser aplicable si se quiere hacer algo mas al actualizar el valor
+  // handler para seleccion de estados
   const handleStateSelect = useCallback((state) => {
     console.log('Selecting state:', state);
     if (state && states[state]) {
@@ -547,33 +546,6 @@ function MainApp() {
       <>
         <div className="min-vh-100 w-100 position-relative">
           <div>
-            {appMetadata.rol === "admin" && <Dropdown>
-              <Dropdown.Toggle variant='info' id='selectorEstados'>
-                {selectedState === 'default' ? 'Select State' : selectedState}
-              </Dropdown.Toggle>
-
-              <Dropdown.Menu>
-                {Object.keys(states)
-                  .filter(state => state !== 'default')
-                  .map(state => (
-                    <Dropdown.Item key={state} onClick={() => handleStateSelect(state)}>
-                      {state}
-                    </Dropdown.Item>
-                  ))}
-              </Dropdown.Menu>
-            </Dropdown>}
-
-            <LogoutButton />
-
-            <div>
-              {appMetadata && (
-                <div>
-                  {appMetadata.estado && <p>{appMetadata.estado}</p>}
-                  {appMetadata.rol && <p>{appMetadata.rol}</p>}
-                </div>
-              )}
-            </div>
-
             <Header />
           </div>
 
@@ -814,7 +786,30 @@ function MainApp() {
               </Card.Body>
             </Card>
           </div>
+          <div>
+            {appMetadata && (
+              <div>
+                {appMetadata.estado && <p>Estado asignado: {appMetadata.estado}</p>}
+                {appMetadata.rol && <p>Rol asignado: {appMetadata.rol}</p>}
+              </div>
+            )}
+          </div>
           <Footer />
+          {appMetadata.rol === "admin" && <Dropdown>
+            <Dropdown.Toggle variant='info' id='selectorEstados'>
+              {selectedState === 'default' ? 'Select State' : selectedState}
+            </Dropdown.Toggle>
+
+            <Dropdown.Menu>
+              {Object.keys(states)
+                .filter(state => state !== 'default')
+                .map(state => (
+                  <Dropdown.Item key={state} onClick={() => handleStateSelect(state)}>
+                    {state}
+                  </Dropdown.Item>
+                ))}
+            </Dropdown.Menu>
+          </Dropdown>}
         </div>
       </>
     );

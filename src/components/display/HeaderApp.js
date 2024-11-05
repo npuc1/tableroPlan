@@ -1,14 +1,24 @@
 import { BsLink45Deg } from 'react-icons/bs';
 import { BsCloudDownload } from 'react-icons/bs';
 import Button from 'react-bootstrap/Button';
+import { useAuth0 } from '@auth0/auth0-react';
+import LogoutButton from './LogoutButton';
 
 const Header = () => {
+
+  const { isAuthenticated } = useAuth0();
+
   return (
 
     <div>
       <div className='header'>
 
-        <div style={{ 'textAlign': 'left', 'paddingBottom': '0px', }}>
+        <div style={{
+          'display': 'flex',
+          'justifyContent': 'space-between',
+          'alignItems': 'center',
+          'paddingBottom': '0px'
+        }}>
           <a
             href="https://www.sna.org.mx/"
             target="_blank"
@@ -18,6 +28,7 @@ const Header = () => {
               alt="Sistema Nacional Anticorrupción"
               style={{ 'width': '300px', 'height': 'auto' }} />
           </a>
+          {isAuthenticated && (<LogoutButton />)}
         </div>
 
         <h1 className='title1'>
