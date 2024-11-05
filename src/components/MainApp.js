@@ -256,7 +256,7 @@ function MainApp() {
           prevData[institution][checkboxId];
       });
 
-      if (!anyChecked) {
+      if (!anyChecked) { // si no hay ninguna seleccionada, borra el input de texto 
         return {
           ...prevData,
           [institution]: {
@@ -279,6 +279,16 @@ function MainApp() {
       };
     });
   };
+
+  // url checker function
+  const isValidURL = (url) => {
+    try {
+      new URL(url);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
 
   // link validation
   const [validationErrors, setValidationErrors] = useState({
@@ -318,21 +328,27 @@ function MainApp() {
           newErrors[`name${action}`] = true;
         } if (!institutionData[`normLink${action}`]?.trim()) {
           newErrors[`link${action}`] = true;
+        } if (institutionData[`normLink${action}`]?.trim() && !isValidURL(institutionData[`normLink${action}`])) {
+          newErrors[`url${action}`] = true;
         }
       }
+
     });
 
     // set nuevos errores (cuando las condiciones se cumplen)
     setValidationErrors(newErrors);
 
+    console.log('Validation Errors:', validationErrors);
+
     // true if no errors, false otherwise
     return Object.keys(newErrors).length === 0;
   };
 
-  // errores para links
+  // mensajes de error
   const errName = "Introduzca el nombre de la normatividad"
   const errLink = "Introduzca el enlace a la normatividad"
   const errCrit = "Seleccione por lo menos un criterio impactado por la modificación normativa"
+  const errURL = "La URL introducida no es válida"
 
   // handler para cambios en input fields
   const handleInputChange = (institution, field, value) => {
@@ -763,11 +779,13 @@ function MainApp() {
                               disabled={!formData[nameInst(currentInstIndex)]?.editableText1 || formData[nameInst(currentInstIndex)]?.lastSaved}
                               maxLength={200}
                               accion="1"
-                              isInvalid={validationErrors.link1}
+                              isInvalid={validationErrors.link1 || validationErrors.url1}
                             />
-                            {validationErrors.link1 && (
+                            {(validationErrors.link1 || validationErrors.url1) && (
                               <Form.Control.Feedback type="invalid" className='feedback-message'>
-                                {errLink}
+                                {validationErrors.link1 ? errLink : 
+                                validationErrors.url1 ? errURL :
+                                "Error"}
                               </Form.Control.Feedback>)}
                           </div>
                         </td>
