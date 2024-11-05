@@ -545,11 +545,11 @@ function MainApp() {
       <>
         <div className="min-vh-100 w-100 position-relative">
           <div>
-            <Header 
-            appMetadata={appMetadata}
-            selectedState={selectedState}
-            states={states}
-            handleStateSelect={handleStateSelect} />
+            <Header
+              appMetadata={appMetadata}
+              selectedState={selectedState}
+              states={states}
+              handleStateSelect={handleStateSelect} />
           </div>
 
           <ReportConfirmationModal
@@ -611,7 +611,7 @@ function MainApp() {
             </Modal.Footer>
           </Modal>
 
-          <div style= {{ 'textAlign': 'center', 'padding-top': '20px', 'padding-bottom': '10px', }}><h4>Comité Coordinador de {selectedState}</h4></div>
+          <div style={{ 'textAlign': 'center', 'padding-top': '20px', 'padding-bottom': '10px', }}><h4>Comité Coordinador de {selectedState}</h4></div>
 
           <div className='card-container'>
             <Card>
@@ -808,7 +808,11 @@ function MainApp() {
     return (
       <>
         <div className="min-vh-100 w-100 overflow-auto">
-          <Header />
+          <Header
+            appMetadata={appMetadata}
+            selectedState={selectedState}
+            states={states}
+            handleStateSelect={handleStateSelect} />
           <div className='postAcuse'>
             <Card>
               <Card.Body>
