@@ -19,6 +19,7 @@ import NoNormativeModal from './modals/NoNormativeModal';
 import Header from './display/HeaderApp';
 import Footer from './display/FooterApp';
 import LogoutButton from './display/LogoutButton';
+import { useAuth0 } from '@auth0/auth0-react';
 
 let instVisit = [0]
 
@@ -47,9 +48,9 @@ const nombresCriterios = [
 
 ]
 
-const acciones = [1, 1, 1, 2, 3, 3, 3, 3, 3, 3, 3, 3,]
+const acciones = [1, 1, 1, 2, 3, 3, 3, 3, 3, 3, 3, 3,];
 
-const posicion = ["1", "2", "3", "1", "1", "2", "3", "4", "5", "6", "7", "8",]
+const posicion = ["1", "2", "3", "1", "1", "2", "3", "4", "5", "6", "7", "8",];
 
 criterios = criterios.map((criterio, index) => ({
   nombreCrit: nombresCriterios[index],
@@ -60,6 +61,12 @@ criterios = criterios.map((criterio, index) => ({
 function MainApp() {
   // otros
   const [isLoading, setIsLoading] = useState(true);
+
+  const {
+    user,
+  } = useAuth0();
+
+  const appMetadata = user.app_metadata;
 
   // objeto default para estados
   const [states, setStates] = useState({
@@ -555,8 +562,16 @@ function MainApp() {
                   ))}
               </Dropdown.Menu>
             </Dropdown>
-            
+
             <LogoutButton />
+
+            <div>
+              {appMetadata && (
+                <div>
+                  {appMetadata.estado && <p>{appMetadata.estado}</p>}
+                </div>
+              )}
+            </div>
 
             <Header />
           </div>
