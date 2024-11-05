@@ -22,6 +22,7 @@ import LogoutButton from './display/LogoutButton';
 import { useAuth0 } from '@auth0/auth0-react';
 import Checkboxes from './misc/Checkboxes';
 import { criterios } from './misc/ListaCriterios';
+import Enlaces from './misc/Enlaces';
 
 let instVisit = [0]
 
@@ -345,10 +346,7 @@ function MainApp() {
   };
 
   // mensajes de error
-  const errName = "Introduzca el nombre de la normatividad"
-  const errLink = "Introduzca el enlace a la normatividad"
   const errCrit = "Seleccione por lo menos un criterio impactado por la modificación normativa"
-  const errURL = "La URL introducida no es válida"
 
   // handler para cambios en input fields
   const handleInputChange = (institution, field, value) => {
@@ -753,107 +751,31 @@ function MainApp() {
                       </tr>
                       <tr>
                         <td>
-                          <div className='enlacesContainer'>
-
-                            <Form.Control
-                              id="inputName1"
-                              type="text"
-                              placeholder='Nombre de la normatividad aplicable'
-                              value={formData[nameInst(currentInstIndex)]?.normName1 || ''} // usa optional chaining para acceder al nombre de manera segura
-                              onChange={(e) => handleInputChange(nameInst(currentInstIndex), 'normName1', e.target.value)} // pasa los tres argumentos necesarios al handler del input
-                              disabled={!formData[nameInst(currentInstIndex)]?.editableText1 || formData[nameInst(currentInstIndex)]?.lastSaved}
-                              maxLength={200}
-                              accion="1"
-                              isInvalid={validationErrors.name1}
-                            />
-                            {validationErrors.name1 && (
-                              <Form.Control.Feedback type="invalid" className='feedback-message'>
-                                {errName}
-                              </Form.Control.Feedback>)}
-                            <Form.Control
-                              id="inputLink1"
-                              type="text"
-                              placeholder='Enlace a la normatividad aplicable'
-                              value={formData[nameInst(currentInstIndex)]?.normLink1 || ''}
-                              onChange={(e) => handleInputChange(nameInst(currentInstIndex), 'normLink1', e.target.value)}
-                              disabled={!formData[nameInst(currentInstIndex)]?.editableText1 || formData[nameInst(currentInstIndex)]?.lastSaved}
-                              maxLength={200}
-                              accion="1"
-                              isInvalid={validationErrors.link1 || validationErrors.url1}
-                            />
-                            {(validationErrors.link1 || validationErrors.url1) && (
-                              <Form.Control.Feedback type="invalid" className='feedback-message'>
-                                {validationErrors.link1 ? errLink : 
-                                validationErrors.url1 ? errURL :
-                                "Error"}
-                              </Form.Control.Feedback>)}
-                          </div>
+                          <Enlaces 
+                          accion="1"
+                          formData={formData}
+                          currentInstIndex={currentInstIndex}
+                          nameInst={nameInst}
+                          handleInputChange={handleInputChange}
+                          validationErrors={validationErrors} />
                         </td>
                         <td>
-                          <div className='enlacesContainer'>
-                            <Form.Control
-                              id="inputName2"
-                              type="text"
-                              placeholder='Nombre de la normatividad aplicable'
-                              value={formData[nameInst(currentInstIndex)]?.normName2 || ''} // usa optional chaining para acceder al nombre de manera segura
-                              onChange={(e) => handleInputChange(nameInst(currentInstIndex), 'normName2', e.target.value)} // pasa los tres argumentos necesarios al handler del input
-                              disabled={!formData[nameInst(currentInstIndex)]?.editableText2 || formData[nameInst(currentInstIndex)]?.lastSaved}
-                              maxLength={200}
-                              accion="2"
-                              isInvalid={validationErrors.name2}
-                            />
-                            {validationErrors.name2 && (
-                              <Form.Control.Feedback type="invalid" className='feedback-message'>
-                                {errName}
-                              </Form.Control.Feedback>)}
-                            <Form.Control
-                              id="inputLink2"
-                              type="text"
-                              placeholder='Enlace a la normatividad aplicable'
-                              value={formData[nameInst(currentInstIndex)]?.normLink2 || ''}
-                              onChange={(e) => handleInputChange(nameInst(currentInstIndex), 'normLink2', e.target.value)} // usa la misma funcion gracias al campo computado [field] de la definicion de la funcion            
-                              disabled={!formData[nameInst(currentInstIndex)]?.editableText2 || formData[nameInst(currentInstIndex)]?.lastSaved}
-                              maxLength={200}
-                              accion="2"
-                              isInvalid={validationErrors.link2}
-                            />
-                            {validationErrors.link2 && (
-                              <Form.Control.Feedback type="invalid" className='feedback-message'>
-                                {errLink}
-                              </Form.Control.Feedback>)}
-                          </div>
+                        <Enlaces 
+                          accion="2"
+                          formData={formData}
+                          currentInstIndex={currentInstIndex}
+                          nameInst={nameInst}
+                          handleInputChange={handleInputChange}
+                          validationErrors={validationErrors} />
                         </td>
                         <td>
-                          <div className='enlacesContainer'>
-                            <Form.Control
-                              id="inputName3"
-                              type="text"
-                              placeholder='Nombre de la normatividad aplicable'
-                              value={formData[nameInst(currentInstIndex)]?.normName3 || ''} // usa optional chaining para acceder al nombre de manera segura
-                              onChange={(e) => handleInputChange(nameInst(currentInstIndex), 'normName3', e.target.value)} // pasa los tres argumentos necesarios al handler del input
-                              disabled={!formData[nameInst(currentInstIndex)]?.editableText3 || formData[nameInst(currentInstIndex)]?.lastSaved}
-                              accion="3"
-                              isInvalid={validationErrors.name3}
-                            />
-                            {validationErrors.name3 && (
-                              <Form.Control.Feedback type="invalid" className='feedback-message'>
-                                {errName}
-                              </Form.Control.Feedback>)}
-                            <Form.Control
-                              id="inputLink3"
-                              type="text"
-                              placeholder='Enlace a la normatividad aplicable'
-                              value={formData[nameInst(currentInstIndex)]?.normLink3 || ''}
-                              onChange={(e) => handleInputChange(nameInst(currentInstIndex), 'normLink3', e.target.value)} // usa la misma funcion gracias al campo computado [field] de la definicion de la funcion           
-                              disabled={!formData[nameInst(currentInstIndex)]?.editableText3 || formData[nameInst(currentInstIndex)]?.lastSaved}
-                              accion="3"
-                              isInvalid={validationErrors.link3}
-                            />
-                            {validationErrors.link3 && (
-                              <Form.Control.Feedback type="invalid" className='feedback-message'>
-                                {errLink}
-                              </Form.Control.Feedback>)}
-                          </div>
+                        <Enlaces 
+                          accion="3"
+                          formData={formData}
+                          currentInstIndex={currentInstIndex}
+                          nameInst={nameInst}
+                          handleInputChange={handleInputChange}
+                          validationErrors={validationErrors} />
                         </td>
                       </tr>
                     </tbody>
