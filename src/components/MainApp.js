@@ -21,6 +21,7 @@ import { useAuth0 } from '@auth0/auth0-react';
 import Checkboxes from './misc/Checkboxes';
 import { criterios } from './misc/ListaCriterios';
 import Enlaces from './misc/Enlaces';
+import { isValidURL } from './misc/URLCheck';
 
 let instVisit = [0]
 
@@ -278,16 +279,6 @@ function MainApp() {
       };
     });
   };
-
-  // url checker function
-  const isValidURL = (url) => {
-    try {
-      new URL(url);
-      return true;
-    } catch (error) {
-      return false;
-    }
-  }
 
   // link validation
   const [validationErrors, setValidationErrors] = useState({
@@ -775,7 +766,7 @@ function MainApp() {
                     </Button>
                   </Stack>
                 </Card.Text>)}
-                {states[selectedState].reporteListo && (
+                {(states[selectedState].reporteListo && appMetadata.rol === "user") && (
                   <Fade
                     in={states[selectedState].reporteListo}
                     appear={true}>
@@ -804,7 +795,7 @@ function MainApp() {
         </div>
       </>
     );
-  } else if (states[selectedState].acuseEmitido === true) {
+  } else if (states[selectedState].acuseEmitido && appMetadata.rol === "user") {
     return (
       <>
         <div className="min-vh-100 w-100 overflow-auto">

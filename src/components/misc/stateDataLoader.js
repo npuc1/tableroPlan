@@ -2,10 +2,10 @@ export const processCSV = (csvContent) => {
   try {
     console.log('Starting CSV processing...');
     
-    // Try to detect and normalize line endings
+    // detect and normalize line endings
     const normalizedContent = csvContent.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
     
-    // Function to parse a CSV line properly handling quotes
+    // Fparse CSV line
     const parseCSVLine = (line) => {
       const result = [];
       let current = '';
@@ -15,16 +15,16 @@ export const processCSV = (csvContent) => {
         const char = line[i];
         
         if (char === '"') {
-          // Check if this is an escaped quote (double quote)
+          // escaped quote (double quote) check
           if (i + 1 < line.length && line[i + 1] === '"') {
             current += '"';
-            i++; // Skip the next quote
+            i++; // skip the next quote
           } else {
-            // Toggle quote mode
+            // toggle quote mode
             inQuotes = !inQuotes;
           }
         } else if (char === ',' && !inQuotes) {
-          // End of field
+          // end of field
           result.push(current.trim());
           current = '';
         } else {
@@ -32,13 +32,13 @@ export const processCSV = (csvContent) => {
         }
       }
       
-      // Don't forget the last field
+      // last field
       result.push(current.trim());
       
       return result;
     };
     
-    // Split into lines and filter out empty lines
+    // split into lines and filter out empty
     let lines = normalizedContent
       .split('\n')
       .map(line => line.trim())
@@ -46,13 +46,13 @@ export const processCSV = (csvContent) => {
     
     console.log('Number of lines found:', lines.length);
     
-    // Process header for state names
+    // process header for state names
     const stateNames = parseCSVLine(lines[0])
       .filter(name => name.length > 0);
     
     console.log('State names found:', stateNames);
     
-    // Initialize stateArray object
+    // initialize stateArray
     const stateArrayObject = {};
     stateNames.forEach(stateName => {
       if (stateName) {
@@ -64,7 +64,7 @@ export const processCSV = (csvContent) => {
       }
     });
     
-    // Process remaining lines as institutions
+    // process remaining lines as institutions
     for (let i = 1; i < lines.length; i++) {
       const row = parseCSVLine(lines[i]);
       
