@@ -751,31 +751,31 @@ function MainApp() {
                       </tr>
                       <tr>
                         <td>
-                          <Enlaces 
-                          accion="1"
-                          formData={formData}
-                          currentInstIndex={currentInstIndex}
-                          nameInst={nameInst}
-                          handleInputChange={handleInputChange}
-                          validationErrors={validationErrors} />
+                          <Enlaces
+                            accion="1"
+                            formData={formData}
+                            currentInstIndex={currentInstIndex}
+                            nameInst={nameInst}
+                            handleInputChange={handleInputChange}
+                            validationErrors={validationErrors} />
                         </td>
                         <td>
-                        <Enlaces 
-                          accion="2"
-                          formData={formData}
-                          currentInstIndex={currentInstIndex}
-                          nameInst={nameInst}
-                          handleInputChange={handleInputChange}
-                          validationErrors={validationErrors} />
+                          <Enlaces
+                            accion="2"
+                            formData={formData}
+                            currentInstIndex={currentInstIndex}
+                            nameInst={nameInst}
+                            handleInputChange={handleInputChange}
+                            validationErrors={validationErrors} />
                         </td>
                         <td>
-                        <Enlaces 
-                          accion="3"
-                          formData={formData}
-                          currentInstIndex={currentInstIndex}
-                          nameInst={nameInst}
-                          handleInputChange={handleInputChange}
-                          validationErrors={validationErrors} />
+                          <Enlaces
+                            accion="3"
+                            formData={formData}
+                            currentInstIndex={currentInstIndex}
+                            nameInst={nameInst}
+                            handleInputChange={handleInputChange}
+                            validationErrors={validationErrors} />
                         </td>
                       </tr>
                     </tbody>
