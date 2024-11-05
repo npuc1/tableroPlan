@@ -608,6 +608,8 @@ function MainApp() {
             </Modal.Footer>
           </Modal>
 
+          <div style= {{ 'textAlign': 'center', 'padding-top': '20px', 'padding-bottom': '10px', }}><h4>Comité Coordinador de {selectedState}</h4></div>
+
           <div className='card-container'>
             <Card>
               <Card.Body>
@@ -787,7 +789,7 @@ function MainApp() {
             </Card>
           </div>
           <div>
-            {appMetadata && (
+            {(appMetadata && appMetadata.rol === "admin") && (
               <div>
                 {appMetadata.estado && <p>Estado asignado: {appMetadata.estado}</p>}
                 {appMetadata.rol && <p>Rol asignado: {appMetadata.rol}</p>}

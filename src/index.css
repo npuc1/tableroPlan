@@ -59,7 +59,7 @@ code {
   display: flex;
   justify-content: center;
   gap: 20px;
-  padding: 20px;
+  padding-top: 20px;
 }
 
 .header {

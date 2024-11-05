@@ -40,8 +40,7 @@ const Header = () => {
         <h5 className='instruccion'>
           Acción 3: Homologación de normatividad
         </h5>
-      </div>
-      <div className='linkBox'>
+        <div className='linkBox'>
         <Button
           variant='secondary'
           href='https://www.sna.org.mx/wp-content/uploads/2024/04/Plan-de-Accion-contrataciones-publicas_250324.pdf'
@@ -51,6 +50,7 @@ const Header = () => {
         <Button variant='secondary'>
           Guía de usuario <BsCloudDownload />
         </Button>
+      </div>
       </div>
     </div>
   )
