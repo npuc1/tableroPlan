@@ -530,7 +530,7 @@ function MainApp() {
   // Safety check for required data
   if (!selectedState || !states[selectedState]) {
     return <div>Loading state information...</div>;
-  }
+  };
 
   if (states[selectedState].acuseEmitido === false) {
     return (
@@ -792,6 +792,7 @@ function MainApp() {
               </div>
             )}
           </div>
+          <GoogleSheetDemo />
           <Footer />
         </div>
       </>
