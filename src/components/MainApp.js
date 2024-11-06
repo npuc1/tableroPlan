@@ -22,6 +22,7 @@ import Checkboxes from './misc/Checkboxes';
 import { criterios } from './misc/ListaCriterios';
 import Enlaces from './misc/Enlaces';
 import { isValidURL } from './misc/URLCheck';
+import GoogleSheetDemo from './misc/SheetsDemo';
 
 let instVisit = [0]
 
