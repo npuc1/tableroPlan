@@ -47,7 +47,7 @@ const GoogleSheetsTest = () => {
                 const { access_token } = await tokenResponse.json();
 
                 const sheetResponse = await fetch(
-                    `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/estados!A1`,
+                    `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/estados!A2`,
                     {
                         headers: {
                             'Authorization': `Bearer ${access_token}`,

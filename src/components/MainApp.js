@@ -22,7 +22,7 @@ import Checkboxes from './misc/Checkboxes';
 import { criterios } from './misc/ListaCriterios';
 import Enlaces from './misc/Enlaces';
 import { isValidURL } from './misc/URLCheck';
-import GoogleSheetDemo from './misc/SheetsDemo';
+import GoogleSheetDemo from './sheets/SheetsDemo';
 
 let instVisit = [0]
 
@@ -165,7 +165,7 @@ function MainApp() {
           reported: false,
           radioValue: '0',
           normModified: false,
-          permaMod: false,
+          permaMod: false, // legacy, no hace nada
           lastSaved: false,
           editable: false,
           normName1: '',
@@ -786,9 +786,10 @@ function MainApp() {
           <div>
             {(appMetadata && appMetadata.rol === "admin") && (
               <div>
-                {appMetadata.estado && <p>Estado seleccionado: {selectedState}</p>}
                 {appMetadata.rol && <p>Rol asignado: {appMetadata.rol}</p>}
                 {appMetadata.rol && <p>Usuario: {user.email}</p>}
+                {appMetadata.estado && <p>Estado seleccionado: {selectedState}</p>}
+                <p>Generó acuse: {String(states[selectedState].acuseEmitido)}</p>
               </div>
             )}
           </div>
