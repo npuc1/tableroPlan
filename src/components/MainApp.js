@@ -22,7 +22,8 @@ import Checkboxes from './misc/Checkboxes';
 import { criterios } from './misc/ListaCriterios';
 import Enlaces from './misc/Enlaces';
 import { isValidURL } from './misc/URLCheck';
-import GoogleSheetDemo from './sheets/SheetsDemo';
+import DataRetriever from './sheets/DataRetriever';
+import GoogleSheetsInit from './sheets/GoogleSheetsInit';
 
 let instVisit = [0]
 
@@ -35,6 +36,7 @@ const renderTooltip = (props) => (
 function MainApp() {
   // otros
   const [isLoading, setIsLoading] = useState(true);
+  const [dataInitialized, setDataInitialized] = useState(false);
 
   const {
     user,
@@ -523,18 +525,20 @@ function MainApp() {
     }
   };
 
-  if (isLoading) {
-    return <div>Loading state data...</div>;
-  }
+  return (
+    <>
+      <GoogleSheetsInit
+        appMetadata={appMetadata}
+        setStates={setStates}
+        setIsLoading={setIsLoading}
+        setDataInitialized={setDataInitialized}
+      />
 
-  // Safety check for required data
-  if (!selectedState || !states[selectedState]) {
-    return <div>Loading state information...</div>;
-  };
-
-  if (states[selectedState].acuseEmitido === false) {
-    return (
-      <>
+      {(!dataInitialized || isLoading || !selectedState || !states[selectedState]) ? (
+        <div>Cargando datos de estado...</div>
+      ) : !selectedState || !states[selectedState] ? (
+        <div>Cargando información del estado...</div>
+      ) : (states[selectedState].acuseEmitido === false || appMetadata.rol === "admin") ? (
         <div className="min-vh-100 w-100 position-relative">
           <div>
             <Header
@@ -789,18 +793,13 @@ function MainApp() {
                 {appMetadata.rol && <p>Rol asignado: {appMetadata.rol}</p>}
                 {appMetadata.rol && <p>Usuario: {user.email}</p>}
                 {appMetadata.estado && <p>Estado seleccionado: {selectedState}</p>}
-                <p>Generó acuse: {String(states[selectedState].acuseEmitido)}</p>
+                <DataRetriever estadoSeleccionado={selectedState} />
               </div>
             )}
           </div>
-          <GoogleSheetDemo />
           <Footer />
         </div>
-      </>
-    );
-  } else if (states[selectedState].acuseEmitido && appMetadata.rol === "user") {
-    return (
-      <>
+      ) : (
         <div className="min-vh-100 w-100 overflow-auto">
           <Header
             appMetadata={appMetadata}
@@ -820,9 +819,9 @@ function MainApp() {
           </div>
           <Footer />
         </div>
-      </>
-    )
-  }
+      )}
+    </>
+  );
 };
 
 export default MainApp;
