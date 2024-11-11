@@ -3,7 +3,7 @@ import sheetsService from '../../services/sheetsService';
 import { criterios } from '../misc/ListaCriterios';
 
 const GoogleSheetsInit = ({ 
-  appMetadata, 
+  selectedState, 
   setStates, 
   setIsLoading, 
   setDataInitialized,
@@ -21,7 +21,7 @@ const GoogleSheetsInit = ({
           instTrackingData,
           criteriosData,
           accionesData
-        } = await sheetsService.fetchAllData(appMetadata.estado);
+        } = await sheetsService.fetchAllData(selectedState);
 
         console.log('Fetched Sheet Data:', {
           stateData,
@@ -30,34 +30,34 @@ const GoogleSheetsInit = ({
           accionesData
         });
 
-        // Update states with status data
+        // update states with status data
         setStates(prevStates => ({
           ...prevStates,
-          [appMetadata.estado]: {
-            ...prevStates[appMetadata.estado],
+          [selectedState]: {
+            ...prevStates[selectedState],
             reporteListo: stateData.reporteListo,
             acuseEmitido: stateData.acuseEmitido
           }
         }));
 
-        // Initialize form data
+        // initialize form data
         setFormData(prevData => {
           const newData = {};
           
           // For each institution in tracking data
           Object.keys(instTrackingData).forEach(institution => {
-            // Get the tracking data for this institution
+            // tracking data for this institution
             const tracking = instTrackingData[institution];
             
-            // Get the criterios data for this institution
+            // criterios data for this institution
             const instCriterios = criteriosData[institution] || [];
             
-            // Get the acciones data for this institution
+            // acciones data for this institution
             const instAcciones = accionesData[institution] || {};
 
             // Initialize the institution data structure
             newData[institution] = {
-              // Base form structure
+              // base form structure
               reported: tracking.reported || false,
               radioValue: tracking.radioValue || '0',
               normModified: tracking.normModified || false,
@@ -74,24 +74,24 @@ const GoogleSheetsInit = ({
               editableText3: false,
             };
 
-            // Initialize all criterios as false
+            // initialize all criterios as false
             criterios.forEach(criterio => {
               const key = `${criterio.accion}${criterio.posicion}`;
               newData[institution][key] = false;
             });
 
-            // Apply criterios data
+            // criterios data
             instCriterios.forEach(crit => {
               const key = `${crit.accion}${crit.criterio}`;
               newData[institution][key] = crit.modificado;
 
-              // If any criterio is modified for this action, set editableText to true
+              // if criterio is modified, set editableText to true
               if (crit.modificado) {
                 newData[institution][`editableText${crit.accion}`] = true;
               }
             });
 
-            // Apply acciones data
+            // acciones data
             Object.keys(instAcciones).forEach(actionNum => {
               const docs = instAcciones[actionNum];
               if (docs && docs.length > 0) {
@@ -103,7 +103,7 @@ const GoogleSheetsInit = ({
               }
             });
 
-            // Double-check editableText flags based on normModified
+            // double-check editableText flags 
             if (tracking.normModified) {
               [1, 2, 3].forEach(action => {
                 const actionCriterios = criterios
@@ -136,7 +136,7 @@ const GoogleSheetsInit = ({
     };
 
     fetchData();
-  }, [appMetadata.estado, setStates, setIsLoading, setDataInitialized, setFormData]);
+  }, [selectedState, setStates, setIsLoading, setDataInitialized, setFormData]);
 
   return error ? <div>Error initializing data: {error}</div> : null;
 };

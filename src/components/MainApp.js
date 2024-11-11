@@ -494,10 +494,6 @@ function MainApp() {
 
       return newIndex;
     });
-
-    console.log('Current institutions visited:', instVisit);
-    console.log('Total institutions:', institutions.length);
-    console.log('Report ready status:', states[selectedState].reporteListo);
   };
 
   const handlePrevInst = () => {
@@ -582,7 +578,7 @@ function MainApp() {
   return (
     <>
       <GoogleSheetsInit
-        appMetadata={appMetadata}
+        selectedState={selectedState}
         setStates={setStates}
         setIsLoading={setIsLoading}
         setDataInitialized={setDataInitialized}

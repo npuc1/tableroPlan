@@ -5,9 +5,9 @@ const SPREADSHEET_ID = process.env.REACT_APP_GOOGLE_SPREADSHEET_ID;
 
 const RANGES = {
   estados: 'estados!A1:C32',
-  insttracking: 'insttracking!A2:G100',
-  criterios: 'criterios!A2:F500',
-  acciones: 'acciones!A2:F500'
+  insttracking: 'insttracking!A2:G221',
+  criterios: 'criterios!A2:F2641',
+  acciones: 'acciones!A2:F661'
 };
 
 class SheetsService {
@@ -79,7 +79,7 @@ class SheetsService {
       console.log('Fetching data for state:', estado);
       const accessToken = await this.getAccessToken();
       
-      // Fetch all ranges in parallel
+      // parallel fetch all ranges
       const [estadosData, instTrackingData, criteriosData, accionesData] = await Promise.all([
         this.fetchRange(RANGES.estados, accessToken),
         this.fetchRange(RANGES.insttracking, accessToken),
@@ -87,7 +87,7 @@ class SheetsService {
         this.fetchRange(RANGES.acciones, accessToken)
       ]);
 
-      // Process estados data
+      // process estados data
       const estadosRows = estadosData.values || [];
       const stateRow = estadosRows.find(row => row[0] === estado);
       const stateData = stateRow ? {
@@ -95,11 +95,11 @@ class SheetsService {
         acuseEmitido: stateRow[2] === '1'
       } : { reporteListo: false, acuseEmitido: false };
 
-      // Process institution tracking data
+      // process institution tracking data
       const instTrackingRows = (instTrackingData.values || [])
         .filter(row => row[0] === estado)
         .reduce((acc, row) => {
-          if (row[1]) { // Check if institution name exists
+          if (row[1]) { // check if institution name exists
             acc[row[1]] = {
               reported: row[2] === 'TRUE',
               radioValue: row[3] || '0',
@@ -111,11 +111,11 @@ class SheetsService {
           return acc;
         }, {});
 
-      // Process criterios data
+      // process criterios data
       const criteriosRows = (criteriosData.values || [])
         .filter(row => row[0] === estado)
         .reduce((acc, row) => {
-          if (row[1]) { // Check if institution name exists
+          if (row[1]) { // check if institution name exists
             if (!acc[row[1]]) acc[row[1]] = [];
             acc[row[1]].push({
               accion: row[2],
@@ -126,11 +126,11 @@ class SheetsService {
           return acc;
         }, {});
 
-      // Process acciones data
+      // process acciones data
       const accionesRows = (accionesData.values || [])
         .filter(row => row[0] === estado)
         .reduce((acc, row) => {
-          if (row[1]) { // Check if institution name exists
+          if (row[1]) { // check if institution name exists
             if (!acc[row[1]]) acc[row[1]] = {};
             if (!acc[row[1]][row[2]]) acc[row[1]][row[2]] = [];
             acc[row[1]][row[2]].push({
@@ -162,4 +162,6 @@ class SheetsService {
   }
 }
 
-export default new SheetsService();
+const sheetsService = new SheetsService();
+
+export default sheetsService;
