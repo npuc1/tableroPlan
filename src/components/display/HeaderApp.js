@@ -10,6 +10,7 @@ const Header = ({
   selectedState,
   states,
   handleStateSelect,
+  isLoadingStates
 }) => {
 
   const { isAuthenticated } = useAuth0();
@@ -57,7 +58,10 @@ const Header = ({
             Guía de usuario <BsCloudDownload />
           </Button>
           {(isAuthenticated && appMetadata.rol === "admin") && <Dropdown>
-            <Dropdown.Toggle variant='info' id='selectorEstados'>
+            <Dropdown.Toggle 
+              variant='info' 
+              id='selectorEstados'
+              disabled={isLoadingStates}>
               {selectedState === 'default' ? 'Select State' : selectedState}
             </Dropdown.Toggle>
 
@@ -65,7 +69,10 @@ const Header = ({
               {Object.keys(states)
                 .filter(state => state !== 'default')
                 .map(state => (
-                  <Dropdown.Item key={state} onClick={() => handleStateSelect(state)}>
+                  <Dropdown.Item 
+                  key={state} 
+                  onClick={() => handleStateSelect(state)}
+                  active={state === selectedState}>
                     {state}
                   </Dropdown.Item>
                 ))}

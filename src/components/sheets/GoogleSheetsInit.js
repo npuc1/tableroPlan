@@ -23,6 +23,18 @@ const GoogleSheetsInit = ({
           accionesData
         } = await sheetsService.fetchAllData(selectedState);
 
+        const institutionsList = Object.keys(instTrackingData);
+
+        setStates(prevStates => ({
+          ...prevStates,
+          [selectedState]: {
+            ...prevStates[selectedState],
+            institutions: institutionsList, 
+            reporteListo: stateData.reporteListo,
+            acuseEmitido: stateData.acuseEmitido
+          }
+        }));
+
         console.log('Fetched Sheet Data:', {
           stateData,
           instTrackingData,
@@ -44,7 +56,6 @@ const GoogleSheetsInit = ({
         setFormData(prevData => {
           const newData = {};
           
-          // For each institution in tracking data
           Object.keys(instTrackingData).forEach(institution => {
             // tracking data for this institution
             const tracking = instTrackingData[institution];
@@ -55,7 +66,7 @@ const GoogleSheetsInit = ({
             // acciones data for this institution
             const instAcciones = accionesData[institution] || {};
 
-            // Initialize the institution data structure
+            // initialize inst data structure
             newData[institution] = {
               // base form structure
               reported: tracking.reported || false,

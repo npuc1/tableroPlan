@@ -68,6 +68,9 @@ class SheetsService {
     );
     
     if (!response.ok) {
+        if (response.status === 429) {
+      throw new Error('429: Rate limit exceeded. Please wait before trying again.');
+    }
       throw new Error(`Failed to fetch range ${range}: ${response.statusText}`);
     }
 
@@ -157,6 +160,43 @@ class SheetsService {
 
     } catch (error) {
       console.error('Error fetching sheet data:', error);
+      throw error;
+    }
+  }
+
+  async getAllStates() {
+    try {
+      const accessToken = await this.getAccessToken();
+      const response = await fetch(
+        `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${RANGES.estados}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+          },
+        }
+      );
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch states: ${response.statusText}`);
+      }
+  
+      const data = await response.json();
+      const states = {};
+  
+      // skip header
+      (data.values || []).slice(1).forEach(row => {
+        if (row[0]) { // if state name exists
+          states[row[0]] = {
+            institutions: [], //
+            reporteListo: row[1] === '1',
+            acuseEmitido: row[2] === '1'
+          };
+        }
+      });
+  
+      return states;
+    } catch (error) {
+      console.error('Error fetching states:', error);
       throw error;
     }
   }

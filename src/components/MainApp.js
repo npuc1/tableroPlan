@@ -11,7 +11,6 @@ import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import ToggleButton from 'react-bootstrap/ToggleButton';
 import ProgressBar from 'react-bootstrap/ProgressBar';
 import Fade from 'react-bootstrap/Fade';
-import { processCSV } from './misc/stateDataLoader';
 import ReportConfirmationModal from './modals/ReportConfirmationModal';
 import NormativeModificationModal from './modals/NormativeModificationModal';
 import NoNormativeModal from './modals/NoNormativeModal';
@@ -24,6 +23,7 @@ import Enlaces from './misc/Enlaces';
 import { isValidURL } from './misc/URLCheck';
 import DataRetriever from './sheets/DataRetriever';
 import GoogleSheetsInit from './sheets/GoogleSheetsInit';
+import sheetsService from '../services/sheetsService';
 
 let instVisit = [0]
 
@@ -37,8 +37,7 @@ function MainApp() {
   // otros
   const [isLoading, setIsLoading] = useState(true);
   const [dataInitialized, setDataInitialized] = useState(false);
-  const [isInitialLoad, setIsInitialLoad] = useState(true);
-
+  const [isLoadingStates, setIsLoadingStates] = useState(true);
   const {
     user,
   } = useAuth0();
@@ -54,6 +53,28 @@ function MainApp() {
     }
   });
 
+   // load states for admin
+   useEffect(() => {
+    const loadStates = async () => {
+      if (appMetadata?.rol === 'admin') {
+        try {
+          setIsLoadingStates(true);
+          const statesData = await sheetsService.getAllStates();
+          setStates(prevStates => ({
+            ...statesData,
+            default: prevStates.default
+          }));
+        } catch (error) {
+          console.error('Error loading states:', error);
+        } finally {
+          setIsLoadingStates(false);
+        }
+      }
+    };
+
+    loadStates();
+  }, [appMetadata?.rol]);
+
   // keep track estado seleccionado
   const [selectedState, setSelectedState] = useState('default'); // formato de un valor en caracter, estado default para prevenir error en initial load
 
@@ -63,40 +84,42 @@ function MainApp() {
   // la institución seleccionada actual, empieza en 0
   const [currentInstIndex, setCurrentInstIndex] = useState(0);
 
-  // data de csv
   useEffect(() => {
-    const loadInitialData = async () => {
-      try {
-        console.log('Starting to load CSV...');
-        const response = await fetch('./data/states.csv');
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+    const initializeState = async () => {
+      if (appMetadata?.estado) {
+        console.log('Initializing state for:', appMetadata.estado);
+        
+        if (appMetadata.rol === 'admin') {
+          try {
+            setIsLoadingStates(true);
+            const statesData = await sheetsService.getAllStates();
+            setStates(prevStates => ({
+              ...statesData,
+              default: prevStates.default
+            }));
+          } catch (error) {
+            console.error('Error loading states:', error);
+          } finally {
+            setIsLoadingStates(false);
+          }
         }
-
-        console.log('CSV file found, reading content...');
-        const csvText = await response.text();
-        console.log('CSV content:', csvText);
-
-        const statesData = processCSV(csvText);
-        console.log('Processed states data:', statesData);
-
-        if (Object.keys(statesData).length > 0) {
-          setStates(statesData);
-          const firstState = appMetadata.estado;
-          setSelectedState(firstState);
-          setInstitutions(statesData[firstState].institutions || []);
-        }
-
-        setIsLoading(false);
-      } catch (error) {
-        console.error('Detailed error in loadInitialData:', error);
-        setIsLoading(false);
+  
+        // set selected state after states are loaded (admin) / immediately (user)
+        setSelectedState(appMetadata.estado);
       }
     };
+  
+    initializeState();
+  }, [appMetadata]);
 
-    loadInitialData();
-  }, [appMetadata.estado]);
+  useEffect(() => {
+    // fetch data if we have a valid state selected
+    if (selectedState && selectedState !== 'default') {
+      console.log('Selected state changed to:', selectedState);
+      setDataInitialized(false); // reset initialization flag
+      setIsLoading(true); // show loading state
+    }
+  }, [selectedState]);
 
   const getInstitutions = useCallback(() => {
     if (!selectedState || !states[selectedState]) {
@@ -155,88 +178,6 @@ function MainApp() {
       clearInterval(timer);
     };
   }, [mostrarModalAcuse, timeRemaining]);
-
-  // useEffect para data inicial
-  useEffect(() => {
-    const loadInitialData = async () => {
-      try {
-        console.log('Starting CSV processing...');
-        const response = await fetch('./data/states.csv');
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const csvText = await response.text();
-        const statesData = processCSV(csvText);
-
-        if (Object.keys(statesData).length > 0) {
-          setStates(statesData);
-          const firstState = appMetadata.estado;
-          setSelectedState(firstState);
-          setInstitutions(statesData[firstState].institutions || []);
-        }
-
-        setIsInitialLoad(false);
-        setIsLoading(false);
-      } catch (error) {
-        console.error('Detailed error in loadInitialData:', error);
-        setIsLoading(false);
-      }
-    };
-
-    loadInitialData();
-  }, [appMetadata.estado]);
-
-  // useEfect formData initialized
-  useEffect(() => {
-    if (selectedState && isInitialLoad) { // solo corre en la carga inicial
-      console.log('Initial form data setup...');
-      setInstitutions(states[selectedState].institutions || []);
-
-      // initialize form data only if it's empty
-      setFormData(prevData => {
-        if (Object.keys(prevData).length > 0) {
-          console.log('Form data already exists, skipping initialization');
-          return prevData;
-        }
-
-        const initialFormData = {};
-        states[selectedState].institutions.forEach(institution => {
-          initialFormData[institution] = {
-            reported: false,
-            radioValue: '0',
-            normModified: false,
-            permaMod: false,
-            lastSaved: false,
-            editable: false,
-            normName1: '',
-            normLink1: '',
-            normName2: '',
-            normLink2: '',
-            normName3: '',
-            normLink3: '',
-            editableText1: false,
-            editableText2: false,
-            editableText3: false,
-          };
-
-          criterios.forEach(criterio => {
-            const propertyName = `${criterio.accion}${criterio.posicion}`;
-            initialFormData[institution][propertyName] = false;
-          });
-        });
-
-        console.log('Initial form data created:', initialFormData);
-        return initialFormData;
-      });
-    } else if (selectedState && !isInitialLoad) {
-      // después de la carga inicial solo actualiza instituciones
-      console.log('Updating institutions list only...');
-      setInstitutions(states[selectedState].institutions || []);
-    }
-  }, [selectedState, states, isInitialLoad]);
-
 
   // handler para seleccion de estados
   const handleStateSelect = useCallback((state) => {
@@ -596,7 +537,8 @@ function MainApp() {
               appMetadata={appMetadata}
               selectedState={selectedState}
               states={states}
-              handleStateSelect={handleStateSelect} />
+              handleStateSelect={handleStateSelect}
+              isLoadingStates={isLoadingStates} />
           </div>
 
           <ReportConfirmationModal
