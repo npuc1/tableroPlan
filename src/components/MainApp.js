@@ -37,6 +37,7 @@ function MainApp() {
   // otros
   const [isLoading, setIsLoading] = useState(true);
   const [dataInitialized, setDataInitialized] = useState(false);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   const {
     user,
@@ -155,42 +156,86 @@ function MainApp() {
     };
   }, [mostrarModalAcuse, timeRemaining]);
 
-  // useEffect actualiza las instituciones cuando se selecciona un estado
+  // useEffect para data inicial
   useEffect(() => {
-    if (selectedState) { // if the value is truthy
-      setInstitutions(states[selectedState].institutions || []); // setea el array de instituciones como las instituciones del estado seleccinado, si es falsy crea un array vacio
+    const loadInitialData = async () => {
+      try {
+        console.log('Starting CSV processing...');
+        const response = await fetch('./data/states.csv');
 
-      // datos de form para cada institución
-      const initialFormData = {}; // inicializa un objeto vacio
-      states[selectedState].institutions.forEach(institution => { // para cada institucion del estado seleccionado
-        initialFormData[institution] = { // asigna estas propiedades en el objeto vacio
-          reported: false,
-          radioValue: '0',
-          normModified: false,
-          permaMod: false, // legacy, no hace nada
-          lastSaved: false,
-          editable: false,
-          normName1: '',
-          normLink1: '',
-          normName2: '',
-          normLink2: '',
-          normName3: '',
-          normLink3: '',
-          editableText1: false,
-          editableText2: false,
-          editableText3: false,
-        };
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
 
-        // crear la lista de propiedades de criterios para cada checkbox dinamicamente
-        criterios.forEach(criterio => {
-          const propertyName = `${criterio.accion}${criterio.posicion}`;
-          initialFormData[institution][propertyName] = false;
+        const csvText = await response.text();
+        const statesData = processCSV(csvText);
+
+        if (Object.keys(statesData).length > 0) {
+          setStates(statesData);
+          const firstState = appMetadata.estado;
+          setSelectedState(firstState);
+          setInstitutions(statesData[firstState].institutions || []);
+        }
+
+        setIsInitialLoad(false);
+        setIsLoading(false);
+      } catch (error) {
+        console.error('Detailed error in loadInitialData:', error);
+        setIsLoading(false);
+      }
+    };
+
+    loadInitialData();
+  }, [appMetadata.estado]);
+
+  // useEfect formData initialized
+  useEffect(() => {
+    if (selectedState && isInitialLoad) { // solo corre en la carga inicial
+      console.log('Initial form data setup...');
+      setInstitutions(states[selectedState].institutions || []);
+
+      // initialize form data only if it's empty
+      setFormData(prevData => {
+        if (Object.keys(prevData).length > 0) {
+          console.log('Form data already exists, skipping initialization');
+          return prevData;
+        }
+
+        const initialFormData = {};
+        states[selectedState].institutions.forEach(institution => {
+          initialFormData[institution] = {
+            reported: false,
+            radioValue: '0',
+            normModified: false,
+            permaMod: false,
+            lastSaved: false,
+            editable: false,
+            normName1: '',
+            normLink1: '',
+            normName2: '',
+            normLink2: '',
+            normName3: '',
+            normLink3: '',
+            editableText1: false,
+            editableText2: false,
+            editableText3: false,
+          };
+
+          criterios.forEach(criterio => {
+            const propertyName = `${criterio.accion}${criterio.posicion}`;
+            initialFormData[institution][propertyName] = false;
+          });
         });
 
+        console.log('Initial form data created:', initialFormData);
+        return initialFormData;
       });
-      setFormData(initialFormData);
+    } else if (selectedState && !isInitialLoad) {
+      // después de la carga inicial solo actualiza instituciones
+      console.log('Updating institutions list only...');
+      setInstitutions(states[selectedState].institutions || []);
     }
-  }, [selectedState, states]);
+  }, [selectedState, states, isInitialLoad]);
 
 
   // handler para seleccion de estados
@@ -236,6 +281,8 @@ function MainApp() {
         }
       };
     });
+
+    console.log('UpdatedFormData', formData);
   };
 
   // handler cambios de checkbox
@@ -259,6 +306,8 @@ function MainApp() {
           prevData[institution][checkboxId];
       });
 
+      console.log('UpdatedFormData', formData);
+
       if (!anyChecked) { // si no hay ninguna seleccionada, borra el input de texto 
         return {
           ...prevData,
@@ -280,6 +329,7 @@ function MainApp() {
           [`editableText${action}`]: true
         }
       };
+
     });
   };
 
@@ -349,6 +399,7 @@ function MainApp() {
         [field]: value
       }
     }));
+    console.log('UpdatedFormData', formData);
   };
 
   // handler toggle value
@@ -366,6 +417,7 @@ function MainApp() {
         }
       }));
       handleCheckboxRChange(institution);
+      console.log('UpdatedFormData', formData);
     }
     console.log(formData[institution].reported);
     console.log(formData[institution].radioValue)
@@ -387,6 +439,7 @@ function MainApp() {
       }
     }));
     setMostrarModalR(false);
+    console.log('UpdatedFormData', formData);
   };
 
   // handler timer
@@ -477,7 +530,7 @@ function MainApp() {
       }
     }));
     setMostrarModalNormS(false);
-    console.log(formData[inst]);
+    console.log('UpdatedFormData Ist', formData[inst]);
   }
 
   // handle modal mod norm
@@ -502,6 +555,7 @@ function MainApp() {
       }
     }));
     setMostrarModalNormN(false);
+    console.log('UpdatedFormData', formData);
   }
 
   const handleEdit = (inst, normod) => {
@@ -532,6 +586,7 @@ function MainApp() {
         setStates={setStates}
         setIsLoading={setIsLoading}
         setDataInitialized={setDataInitialized}
+        setFormData={setFormData}
       />
 
       {(!dataInitialized || isLoading || !selectedState || !states[selectedState]) ? (
