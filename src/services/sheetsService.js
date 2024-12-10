@@ -323,6 +323,57 @@ class SheetsService {
       throw error;
     }
   }
+
+  async updateAcuseStatus(state) {
+    try {
+      const accessToken = await this.getAccessToken();
+      
+      // First, find the row for this state in the estados sheet
+      const estadosResponse = await this.fetchRange(RANGES.estados, accessToken);
+      const estadosRows = estadosResponse.values || [];
+      
+      // Find the row index for this state (add 1 because sheet is 1-based)
+      const stateRowIndex = estadosRows.findIndex(row => row[0] === state) + 1;
+      
+      if (stateRowIndex === 0) {
+        throw new Error(`State ${state} not found in estados sheet`);
+      }
+
+      // Prepare the update request
+      const updateRequest = {
+        valueInputOption: 'RAW',
+        data: [{
+          range: `estados!C${stateRowIndex}`,  // Column C for acuseEmitido
+          values: [['1']]  // Update to 1 to indicate acuse was generated
+        }]
+      };
+
+      // Make the update request
+      const response = await fetch(
+        `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values:batchUpdate`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(updateRequest)
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Failed to update acuse status: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      return result;
+
+    } catch (error) {
+      console.error('Error updating acuse status:', error);
+      throw error;
+    }
+  }
+
 }
 
 const sheetsService = new SheetsService();

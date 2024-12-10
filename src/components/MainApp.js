@@ -23,6 +23,7 @@ import Enlaces from './misc/Enlaces';
 import { isValidURL } from './misc/URLCheck';
 import GoogleSheetsInit from './sheets/GoogleSheetsInit';
 import sheetsService from '../services/sheetsService';
+import DescargaAcuse from '../services/DescargaAcuse';
 
 let instVisit = [0]
 
@@ -362,7 +363,10 @@ function MainApp() {
   }
 
   // handler acuse
-  const handleAcuse = () => {
+  const handleAcuse = async () => {
+
+    await sheetsService.updateAcuseStatus(selectedState);
+
     setMostrarModalAcuse(false);
     setStates(prevStates => ({
       ...prevStates,
@@ -371,6 +375,9 @@ function MainApp() {
         acuseEmitido: true
       }
     }));
+
+    DescargaAcuse()
+
   };
 
   // handler modal guardado
@@ -861,8 +868,11 @@ function MainApp() {
               <Card.Body>
                 <Card.Title></Card.Title>
                 <Card.Text><div>Su reporte ha sido enviado.</div>
-                  <div style={{ 'paddingTop': '20px', 'display': 'flex', 'justifyContent': 'center', }}><Button
-                    variant='warning'>Descargar acuse</Button></div>
+                  <div style={{ 'paddingTop': '20px', 'display': 'flex', 'justifyContent': 'center', }}>
+                    <Button
+                    variant='warning'
+                    onClick={() => DescargaAcuse()}>Descargar acuse
+                    </Button></div>
                 </Card.Text>
               </Card.Body>
             </Card>
