@@ -21,7 +21,6 @@ import Checkboxes from './misc/Checkboxes';
 import { criterios } from './misc/ListaCriterios';
 import Enlaces from './misc/Enlaces';
 import { isValidURL } from './misc/URLCheck';
-import DataRetriever from './sheets/DataRetriever';
 import GoogleSheetsInit from './sheets/GoogleSheetsInit';
 import sheetsService from '../services/sheetsService';
 
@@ -53,10 +52,11 @@ function MainApp() {
     }
   });
 
-   // load states for admin
-   useEffect(() => {
-    const loadStates = async () => {
-      if (appMetadata?.rol === 'admin') {
+  useEffect(() => {
+    const initializeState = async () => {
+      if (appMetadata?.estado) {
+        console.log('Initializing state for:', appMetadata.estado);
+        
         try {
           setIsLoadingStates(true);
           const statesData = await sheetsService.getAllStates();
@@ -69,11 +69,14 @@ function MainApp() {
         } finally {
           setIsLoadingStates(false);
         }
+  
+        // set selected state after states are loaded (admin) / immediately (user)
+        setSelectedState(appMetadata.estado);
       }
     };
-
-    loadStates();
-  }, [appMetadata?.rol]);
+  
+    initializeState();
+  }, [appMetadata]);
 
   // keep track estado seleccionado
   const [selectedState, setSelectedState] = useState('default'); // formato de un valor en caracter, estado default para prevenir error en initial load
@@ -85,37 +88,8 @@ function MainApp() {
   const [currentInstIndex, setCurrentInstIndex] = useState(0);
 
   useEffect(() => {
-    const initializeState = async () => {
-      if (appMetadata?.estado) {
-        console.log('Initializing state for:', appMetadata.estado);
-        
-        if (appMetadata.rol === 'admin') {
-          try {
-            setIsLoadingStates(true);
-            const statesData = await sheetsService.getAllStates();
-            setStates(prevStates => ({
-              ...statesData,
-              default: prevStates.default
-            }));
-          } catch (error) {
-            console.error('Error loading states:', error);
-          } finally {
-            setIsLoadingStates(false);
-          }
-        }
-  
-        // set selected state after states are loaded (admin) / immediately (user)
-        setSelectedState(appMetadata.estado);
-      }
-    };
-  
-    initializeState();
-  }, [appMetadata]);
-
-  useEffect(() => {
     // fetch data if we have a valid state selected
     if (selectedState && selectedState !== 'default') {
-      console.log('Selected state changed to:', selectedState);
       setDataInitialized(false); // reset initialization flag
       setIsLoading(true); // show loading state
     }
@@ -181,7 +155,6 @@ function MainApp() {
 
   // handler para seleccion de estados
   const handleStateSelect = useCallback((state) => {
-    console.log('Selecting state:', state);
     if (state && states[state]) {
       setSelectedState(state);
       setCurrentInstIndex(0);
@@ -329,7 +302,7 @@ function MainApp() {
   };
 
   // mensajes de error
-  const errCrit = "Seleccione por lo menos un criterio impactado por la modificación normativa"
+  const errCrit = "Seleccione por lo menos un criterio contenido en la normatividad"
 
   // handler para cambios en input fields
   const handleInputChange = (institution, field, value) => {
@@ -360,8 +333,6 @@ function MainApp() {
       handleCheckboxRChange(institution);
       console.log('UpdatedFormData', formData);
     }
-    console.log(formData[institution].reported);
-    console.log(formData[institution].radioValue)
   }
 
   // handler modal reporte
@@ -403,9 +374,9 @@ function MainApp() {
   };
 
   // handler modal guardado
-  const handleModalNorm = (normMod, inst, permod) => {
+  const handleModalNorm = (normMod, inst) => {
     if (normMod === true) {
-      handleSaveNormSMod(inst, permod)
+      handleSaveNormSMod(inst)
     } else {
       setMostrarModalNormN(true)
     }
@@ -456,44 +427,130 @@ function MainApp() {
 
 
   // funcion handle save con modificacion normativa
-  const handleSaveNormS = (inst) => {
-    setFormData(prevData => ({
-      ...prevData,
-      [inst]: {
-        ...prevData[inst],
-        permaMod: false,
+  const handleSaveNormS = async (inst) => {
+    try {
+      // Reset states
+  
+      // Validate before saving
+      const isValid = validateFormBeforeSave(inst);
+      if (!isValid) {
+        throw new Error('Por favor complete todos los campos requeridos');
+      }
+  
+      // Prepare complete data for saving
+      const dataToSave = {
+        // Basic tracking data
+        reported: formData[inst].reported,
+        radioValue: formData[inst].radioValue,
+        normModified: formData[inst].normModified,
         lastSaved: true,
         editable: false,
-      }
-    }));
-    setMostrarModalNormS(false);
-    console.log('UpdatedFormData Ist', formData[inst]);
-  }
+  
+        // Add all criterios data
+        ...Object.fromEntries(
+          criterios.map(criterio => [
+            `${criterio.accion}${criterio.posicion}`,
+            formData[inst][`${criterio.accion}${criterio.posicion}`] || false
+          ])
+        ),
+  
+        // Add normative document data
+        ...Object.fromEntries(
+          [1, 2, 3].flatMap(accion => [
+            [`normName${accion}`, formData[inst][`normName${accion}`] || ''],
+            [`normLink${accion}`, formData[inst][`normLink${accion}`] || ''],
+            [`editableText${accion}`, formData[inst][`editableText${accion}`] || false]
+          ])
+        )
+      };
+  
+      // Save to Google Sheets
+      await sheetsService.saveInstitutionData(selectedState, inst, dataToSave);
+  
+      // Update local state
+      setFormData(prevData => ({
+        ...prevData,
+        [inst]: {
+          ...prevData[inst],
+          lastSaved: true,
+          editable: false,
+        }
+      }));
+  
+      setMostrarModalNormS(false);
+  
+    } catch (error) {
+      console.error('Error saving data:', error);
+    }
+  };
 
   // handle modal mod norm
-  const handleSaveNormSMod = (inst, permod) => {
+  const handleSaveNormSMod = (inst) => {
+    console.log("modal handler init");
     const isValid = validateFormBeforeSave(inst);
 
     if (isValid) {
-      if (permod === false) {
-        setMostrarModalNormS(true)
-      } else if (permod === true) {
-        handleSaveNormS(inst)
-      }
+      setMostrarModalNormS(true)
     }
   }
 
-  const handleSaveNormN = (inst) => {
-    setFormData(prevData => ({
-      ...prevData,
-      [inst]: {
-        ...prevData[inst],
+  const handleSaveNormN = async (inst) => {
+    try {
+
+      const dataToSave = {
+        reported: formData[inst].reported,
+        radioValue: formData[inst].radioValue,
+        normModified: false,
         lastSaved: true,
-      }
-    }));
-    setMostrarModalNormN(false);
-    console.log('UpdatedFormData', formData);
-  }
+        editable: false,
+        // Reset all criterios to false
+        ...Object.fromEntries(
+          criterios.map(criterio => [
+            `${criterio.accion}${criterio.posicion}`,
+            false
+          ])
+        ),
+        // Reset all normative document fields
+        ...Object.fromEntries(
+          [1, 2, 3].flatMap(accion => [
+            [`normName${accion}`, ''],
+            [`normLink${accion}`, ''],
+            [`editableText${accion}`, false]
+          ])
+        )
+      };
+  
+      await sheetsService.saveInstitutionData(selectedState, inst, dataToSave);
+  
+      setFormData(prevData => ({
+        ...prevData,
+        [inst]: {
+          ...prevData[inst],
+          lastSaved: true,
+          normModified: false,
+          // Reset all related fields
+          ...Object.fromEntries(
+            criterios.map(criterio => [
+              `${criterio.accion}${criterio.posicion}`,
+              false
+            ])
+          ),
+          ...Object.fromEntries(
+            [1, 2, 3].flatMap(accion => [
+              [`normName${accion}`, ''],
+              [`normLink${accion}`, ''],
+              [`editableText${accion}`, false]
+            ])
+          )
+        }
+      }));
+  
+      setMostrarModalNormN(false);
+  
+    } catch (error) {
+      console.error('Error saving data:', error);
+    }
+  };
 
   const handleEdit = (inst, normod) => {
     if (normod === true) {
@@ -655,7 +712,7 @@ function MainApp() {
                     label="La normatividad considera los criterios del Plan de Acción"
                     checked={formData[nameInst(currentInstIndex)]?.normModified || false}
                     onChange={() => handleCheckboxRChange(nameInst(currentInstIndex))}
-                    disabled={formData[nameInst(currentInstIndex)]?.permaMod || ((formData[nameInst(currentInstIndex)]?.lastSaved) && (!formData[nameInst(currentInstIndex)]?.normMod))}
+                    disabled={((formData[nameInst(currentInstIndex)]?.lastSaved) && (!formData[nameInst(currentInstIndex)]?.normMod))}
                   />
                   <Table bordered className='tablaReporte'>
                     <thead>
@@ -753,7 +810,7 @@ function MainApp() {
                   <Stack gap={1} className="buttonContainer">
                     <div className="text-danger" textAlign="center">{validationErrors.checkboxes && errCrit}</div>
                     <Button
-                      onClick={() => handleModalNorm(formData[nameInst(currentInstIndex)]?.normModified, nameInst(currentInstIndex), formData[nameInst(currentInstIndex)]?.permaMod)}
+                      onClick={() => handleModalNorm(formData[nameInst(currentInstIndex)]?.normModified, nameInst(currentInstIndex))}
                       disabled={formData[nameInst(currentInstIndex)]?.lastSaved}>
                       Guardar
                     </Button>
@@ -786,7 +843,7 @@ function MainApp() {
                 {appMetadata.rol && <p>Rol asignado: {appMetadata.rol}</p>}
                 {appMetadata.rol && <p>Usuario: {user.email}</p>}
                 {appMetadata.estado && <p>Estado seleccionado: {selectedState}</p>}
-                <DataRetriever estadoSeleccionado={selectedState} />
+                {states && <p>Acuse generado: {"" + states[selectedState].acuseEmitido}</p>}
               </div>
             )}
           </div>

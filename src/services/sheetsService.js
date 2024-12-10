@@ -25,7 +25,7 @@ class SheetsService {
     const now = Math.floor(Date.now() / 1000);
     const claim = {
       iss: this.credentials.client_email,
-      scope: 'https://www.googleapis.com/auth/spreadsheets.readonly',
+      scope: 'https://www.googleapis.com/auth/spreadsheets',
       aud: 'https://oauth2.googleapis.com/token',
       exp: now + 3600,
       iat: now,
@@ -200,8 +200,130 @@ class SheetsService {
       throw error;
     }
   }
+
+  async saveInstitutionData(estado, institution, data) {
+    try {
+      const accessToken = await this.getAccessToken();
+      
+      // First, we'll get the current data to find the correct rows to update
+      const [trackingData, criteriosData, accionesData] = await Promise.all([
+        this.fetchRange('insttracking!A2:G221', accessToken),
+        this.fetchRange('criterios!A2:F2641', accessToken),
+        this.fetchRange('acciones!A2:F661', accessToken)
+      ]);
+
+      // Find row indices for each sheet
+      const trackingRowIndex = trackingData.values.findIndex(row => 
+        row[0] === estado && row[1] === institution
+      ) + 2; // +2 because sheet is 1-based and we skipped header
+
+      // Prepare the batch update request
+      const requests = [];
+
+      // 1. Update tracking data
+      requests.push({
+        range: `insttracking!A${trackingRowIndex}:G${trackingRowIndex}`,
+        values: [[
+          estado,
+          institution,
+          data.reported.toString().toUpperCase(),
+          data.radioValue,
+          data.normModified.toString().toUpperCase(),
+          data.lastSaved.toString().toUpperCase(),
+          data.editable.toString().toUpperCase()
+        ]]
+      });
+
+      // 2. Prepare criterios updates
+      const criteriosUpdates = [];
+      for (const accion of [1, 2, 3]) {
+        const criteriosForAccion = Object.entries(data)
+          .filter(([key, value]) => key.startsWith(`${accion}`) && key.length === 2)
+          .map(([key, value]) => ({
+            accion: key.charAt(0),
+            criterio: key.charAt(1),
+            modificado: value
+          }));
+
+        criteriosForAccion.forEach(criterio => {
+          criteriosUpdates.push([
+            estado,
+            institution,
+            criterio.accion,
+            criterio.criterio,
+            criterio.modificado ? '1' : '0',
+            new Date().toISOString()
+          ]);
+        });
+      }
+
+      // Find and update existing criterios rows or append new ones
+      const criteriosStartRow = criteriosData.values.findIndex(row => 
+        row[0] === estado && row[1] === institution
+      ) + 2;
+
+      if (criteriosStartRow > 1) {
+        requests.push({
+          range: `criterios!A${criteriosStartRow}:F${criteriosStartRow + criteriosUpdates.length - 1}`,
+          values: criteriosUpdates
+        });
+      }
+
+      // 3. Prepare acciones (normative documents) updates
+      const accionesUpdates = [];
+      for (const accion of [1, 2, 3]) {
+        if (data[`editableText${accion}`] && data[`normName${accion}`]) {
+          accionesUpdates.push([
+            estado,
+            institution,
+            accion.toString(),
+            data[`normLink${accion}`] || '',
+            data[`normName${accion}`] || '',
+            new Date().toISOString()
+          ]);
+        }
+      }
+
+      // Find and update existing acciones rows or append new ones
+      const accionesStartRow = accionesData.values.findIndex(row => 
+        row[0] === estado && row[1] === institution
+      ) + 2;
+
+      if (accionesStartRow > 1) {
+        requests.push({
+          range: `acciones!A${accionesStartRow}:F${accionesStartRow + accionesUpdates.length - 1}`,
+          values: accionesUpdates
+        });
+      }
+
+      // Execute the batch update
+      const batchUpdateResponse = await fetch(
+        `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values:batchUpdate`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            valueInputOption: 'RAW',
+            data: requests
+          })
+        }
+      );
+
+      if (!batchUpdateResponse.ok) {
+        throw new Error('Failed to update data');
+      }
+
+      return await batchUpdateResponse.json();
+
+    } catch (error) {
+      console.error('Error saving complete institution data:', error);
+      throw error;
+    }
+  }
 }
 
 const sheetsService = new SheetsService();
-
 export default sheetsService;

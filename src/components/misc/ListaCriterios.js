@@ -11,8 +11,8 @@ export const criterios = (() => {
         "Medios consultados para la investigación",
         "Justificación para la selección de empresas",
         "Soporte documental",
-        "Utilización de fraccionamientos",
-        "Incorporación de OIC y área jurídica",
+        "Utilización de fraccionamientos*",
+        "Incorporación de OIC y área jurídica*",
 
     ]
 
