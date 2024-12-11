@@ -39,10 +39,10 @@ const Header = ({
         </div>
 
         <h1 className='title1'>
-          Tablero de reporte
+          Tablero de Reporte
         </h1>
         <h4 className='title2'>
-          Plan de Acción para fortalecer los procesos de contrataciones públicas <br></br> en materia de adquisiciones, arrendamientos y servicios
+          Plan de Acción para fortalecer los procesos de contrataciones públicas <br></br> en materia de adquisiciones, arrendamientos y servicios del sector público
         </h4>
         <h5 className='instruccion'>
           Acción 3: Homologación de normatividad

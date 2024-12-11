@@ -18,7 +18,7 @@ const NoNormativeModal = ({
                 <Modal.Title>Normatividad aplicable</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                ¿Desea confirmar que esta institución no considera ningún criterio del Plan de Acción en su normatividad?
+                ¿Desea confirmar que esta institución NO considera ningún criterio del Plan de Acción en su normatividad?
                 Podrá cambiar su respuesta hasta antes de concluir el reporte.
             </Modal.Body>
             <Modal.Footer>
