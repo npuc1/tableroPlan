@@ -1,13 +1,15 @@
 import acuse from '../components/misc/acuse';
-import { marked } from "marked";
+// import { marked } from "marked";
 
 function DescargaAcuse() {
 
-    const htmlContent = marked(acuse);
+    const rawHtml = acuse()
+
+    // const htmlContent = marked(rawHtml);
 
     // Crear el PDF
 
-    const blob = new Blob([htmlContent], { type: 'text/html' });
+    const blob = new Blob([rawHtml], { type: 'text/html' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
