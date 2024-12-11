@@ -1,4 +1,6 @@
-<!DOCTYPE html>
+const formato = () => {
+    return(`
+        <!DOCTYPE html>
 
 <html>
 
@@ -68,3 +70,7 @@
 </body>
 
 </html>
+    `)
+}
+
+export default formato;
