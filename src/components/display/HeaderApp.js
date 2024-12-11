@@ -4,6 +4,7 @@ import Button from 'react-bootstrap/Button';
 import { useAuth0 } from '@auth0/auth0-react';
 import LogoutButton from './LogoutButton';
 import Dropdown from 'react-bootstrap/Dropdown';
+import DescargaManual from '../../services/DescargaManual';
 
 const Header = ({
   appMetadata,
@@ -54,8 +55,10 @@ const Header = ({
             target='_blank'>
             Plan de Acción <BsLink45Deg />
           </Button>
-          <Button variant='secondary'>
-            Guía de usuario <BsCloudDownload />
+          <Button 
+          variant='secondary'
+          onClick={() => DescargaManual()}>
+            Manual de usuario <BsCloudDownload />
           </Button>
           {(isAuthenticated && appMetadata.rol === "admin") && <Dropdown>
             <Dropdown.Toggle 

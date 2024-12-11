@@ -29,7 +29,7 @@ let instVisit = [0]
 
 const renderTooltip = (props) => (
   <Tooltip id="button-tooltip" {...props}>
-    Para consultar las definiciones extendidas de las acciones y criterios, descarge la guía de usuario
+    Para consultar las definiciones extendidas de las acciones y criterios, descarge el manual de usuario
   </Tooltip>
 );
 
