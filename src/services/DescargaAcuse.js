@@ -1,13 +1,13 @@
 import acuse from '../components/misc/acuse';
 // import { marked } from "marked";
 
-function DescargaAcuse() {
+function DescargaAcuse(estado, datosEstado) {
 
-    const rawHtml = acuse()
+    const rawHtml = acuse(estado, datosEstado)
 
     // const htmlContent = marked(rawHtml);
 
-    // Crear el PDF
+    // crear el PDF
 
     const blob = new Blob([rawHtml], { type: 'text/html' });
     const url = URL.createObjectURL(blob);
@@ -16,6 +16,8 @@ function DescargaAcuse() {
     link.download = 'document.html';
     link.click();
     URL.revokeObjectURL(url);
+
+    console.log(datosEstado)
 
 }
 

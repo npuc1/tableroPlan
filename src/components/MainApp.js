@@ -376,7 +376,7 @@ function MainApp() {
       }
     }));
 
-    DescargaAcuse()
+    DescargaAcuse(selectedState, formData)
 
   };
 
@@ -871,7 +871,7 @@ function MainApp() {
                   <div style={{ 'paddingTop': '20px', 'display': 'flex', 'justifyContent': 'center', }}>
                     <Button
                     variant='warning'
-                    onClick={() => DescargaAcuse()}>Descargar acuse
+                    onClick={() => DescargaAcuse(selectedState, formData)}>Descargar acuse
                     </Button></div>
                 </Card.Text>
               </Card.Body>
