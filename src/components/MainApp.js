@@ -24,6 +24,7 @@ import { isValidURL } from './misc/URLCheck';
 import GoogleSheetsInit from '../services/GoogleSheetsInit';
 import sheetsService from '../services/sheetsService';
 import DescargaAcuse from '../services/DescargaAcuse';
+import NoReportModal from './modals/NoReportModal';
 
 let instVisit = [0]
 
@@ -57,7 +58,7 @@ function MainApp() {
     const initializeState = async () => {
       if (appMetadata?.estado) {
         console.log('Initializing state for:', appMetadata.estado);
-        
+
         try {
           setIsLoadingStates(true);
           const statesData = await sheetsService.getAllStates();
@@ -70,12 +71,12 @@ function MainApp() {
         } finally {
           setIsLoadingStates(false);
         }
-  
+
         // set selected state after states are loaded (admin) / immediately (user)
         setSelectedState(appMetadata.estado);
       }
     };
-  
+
     initializeState();
   }, [appMetadata]);
 
@@ -122,11 +123,13 @@ function MainApp() {
 
   // use states para modales
   const [mostrarModalR, setMostrarModalR] = useState(false);
+  const [mostrarModalNoR, setMostrarModalNoR] = useState(false);
   const [mostrarModalNormS, setMostrarModalNormS] = useState(false);
   const [mostrarModalNormN, setMostrarModalNormN] = useState(false);
   const [mostrarModalAcuse, setMostrarModalAcuse] = useState(false);
 
   const handleCloseR = () => setMostrarModalR(false); // handle para cerrar al hacer clic, el handle para mostrar viene en la misma función que el guardado
+  const handleCloseNoR = () => setMostrarModalNoR(false);
   const handleCloseNormS = () => setMostrarModalNormS(false);
   const handleCloseNormN = () => setMostrarModalNormN(false);
   const handleCloseModalAcuse = () => {
@@ -164,16 +167,15 @@ function MainApp() {
   }, [states]);
 
   // handler cambios de checkbox de normatividad
-  const handleCheckboxRChange = (institution) => {
+  const handleCheckboxRChange = (institution, manual) => {
     setFormData(prevData => {
-      const isUnchecking = prevData[institution].normModified; // extrae el estatus actual para verificar que estamos uncheckeando
-
-      // reset object with all checkboxes set to false
       const resetCheckboxes = {}; // objeto vacío para asignarle todas las propiedades en falso
       criterios.forEach(criterio => {
         const propertyName = `${criterio.accion}${criterio.posicion}`; // crea el nombre de la propiedad a partir de criterios (definido anteirormente)
         resetCheckboxes[propertyName] = false; // asigna todas las propiedades con falso al objeto vacío
       });
+      if(manual) {
+        const isUnchecking = prevData[institution].normModified; // extrae el estatus actual para verificar que estamos uncheckeando
 
       return {
         ...prevData,
@@ -195,6 +197,31 @@ function MainApp() {
           })
         }
       };
+      } else {
+        const isUnchecking = true; // always unchecking
+
+      return {
+        ...prevData,
+        [institution]: {
+          ...prevData[institution],
+          normModified: false,
+          editable: false,
+          lastSaved: false,
+          ...(isUnchecking && { // si se está modificando, devuelve todos los valores de reset
+            ...resetCheckboxes,
+            normName1: "",
+            normLink1: "",
+            normName2: "",
+            normLink2: "",
+            normName3: "",
+            normLink3: "",
+            editableText1: false,
+            editableText2: false,
+            editableText3: false,
+          })
+        }
+      };
+      }
     });
 
     console.log('UpdatedFormData', formData);
@@ -323,16 +350,7 @@ function MainApp() {
       handleModalR();
       setPendValue(radioVal);
     } else if (formData[institution].radioValue === '1') {
-      setFormData(prevData => ({
-        ...prevData,
-        [institution]: {
-          ...prevData[institution],
-          reported: !prevData[institution].reported,
-          radioValue: '0',
-        }
-      }));
-      handleCheckboxRChange(institution);
-      console.log('UpdatedFormData', formData);
+      handleModalNoR();
     }
   }
 
@@ -341,17 +359,35 @@ function MainApp() {
     setMostrarModalR(true);
   }
 
+  const handleModalNoR = () => {
+    setMostrarModalNoR(true);
+  }
+
   // handler boton confirmar reporte modal
   const handleReport = (institution) => {
     setFormData(prevData => ({
       ...prevData,
       [institution]: {
         ...prevData[institution],
-        reported: !prevData[institution].reported,
-        radioValue: pendValue
+        reported: true,
+        radioValue: pendValue,
       }
     }));
     setMostrarModalR(false);
+    console.log('UpdatedFormData', formData);
+  };
+
+  const handleNoReport = (institution) => {
+    setMostrarModalNoR(false);
+    setFormData(prevData => ({
+      ...prevData,
+      [institution]: {
+        ...prevData[institution],
+        reported: false,
+        radioValue: '0',
+      }
+    }));
+    handleCheckboxRChange(institution, false);
     console.log('UpdatedFormData', formData);
   };
 
@@ -437,13 +473,13 @@ function MainApp() {
   const handleSaveNormS = async (inst) => {
     try {
       // Reset states
-  
+
       // Validate before saving
       const isValid = validateFormBeforeSave(inst);
       if (!isValid) {
         throw new Error('Por favor complete todos los campos requeridos');
       }
-  
+
       // Prepare complete data for saving
       const dataToSave = {
         // Basic tracking data
@@ -452,7 +488,7 @@ function MainApp() {
         normModified: formData[inst].normModified,
         lastSaved: true,
         editable: false,
-  
+
         // Add all criterios data
         ...Object.fromEntries(
           criterios.map(criterio => [
@@ -460,7 +496,7 @@ function MainApp() {
             formData[inst][`${criterio.accion}${criterio.posicion}`] || false
           ])
         ),
-  
+
         // Add normative document data
         ...Object.fromEntries(
           [1, 2, 3].flatMap(accion => [
@@ -470,10 +506,10 @@ function MainApp() {
           ])
         )
       };
-  
+
       // Save to Google Sheets
       await sheetsService.saveInstitutionData(selectedState, inst, dataToSave);
-  
+
       // Update local state
       setFormData(prevData => ({
         ...prevData,
@@ -483,9 +519,9 @@ function MainApp() {
           editable: false,
         }
       }));
-  
+
       setMostrarModalNormS(false);
-  
+
     } catch (error) {
       console.error('Error saving data:', error);
     }
@@ -526,9 +562,9 @@ function MainApp() {
           ])
         )
       };
-  
+
       await sheetsService.saveInstitutionData(selectedState, inst, dataToSave);
-  
+
       setFormData(prevData => ({
         ...prevData,
         [inst]: {
@@ -551,9 +587,9 @@ function MainApp() {
           )
         }
       }));
-  
+
       setMostrarModalNormN(false);
-  
+
     } catch (error) {
       console.error('Error saving data:', error);
     }
@@ -609,6 +645,13 @@ function MainApp() {
             show={mostrarModalR}
             onClose={() => handleCloseR()}
             onConfirm={handleReport}
+            institutionName={nameInst(currentInstIndex)}
+          />
+
+          <NoReportModal
+            show={mostrarModalNoR}
+            onClose={() => handleCloseNoR()}
+            onConfirm={handleNoReport}
             institutionName={nameInst(currentInstIndex)}
           />
 
@@ -718,7 +761,7 @@ function MainApp() {
                     style={{ 'padding-bottom': '10px' }}
                     label="La normatividad considera los criterios del Plan de Acción"
                     checked={formData[nameInst(currentInstIndex)]?.normModified || false}
-                    onChange={() => handleCheckboxRChange(nameInst(currentInstIndex))}
+                    onChange={() => handleCheckboxRChange(nameInst(currentInstIndex), true)}
                     disabled={((formData[nameInst(currentInstIndex)]?.lastSaved) && (!formData[nameInst(currentInstIndex)]?.normMod))}
                   />
                   <Table bordered className='tablaReporte'>
@@ -870,8 +913,8 @@ function MainApp() {
                 <Card.Text><div>Su reporte ha sido enviado.</div>
                   <div style={{ 'paddingTop': '20px', 'display': 'flex', 'justifyContent': 'center', }}>
                     <Button
-                    variant='warning'
-                    onClick={() => DescargaAcuse(selectedState, formData)}>Descargar acuse
+                      variant='warning'
+                      onClick={() => DescargaAcuse(selectedState, formData)}>Descargar acuse
                     </Button></div>
                 </Card.Text>
               </Card.Body>
