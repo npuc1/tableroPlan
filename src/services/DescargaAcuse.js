@@ -1,24 +1,20 @@
-import acuse from '../components/misc/acuse';
-// import { marked } from "marked";
+// DescargaAcuse.js
+import { pdf } from '@react-pdf/renderer';
+import AcusePDF from './AcusePDF';
 
-function DescargaAcuse(estado, datosEstado) {
-
-    const rawHtml = acuse(estado, datosEstado)
-
-    // const htmlContent = marked(rawHtml);
-
-    // crear el PDF
-
-    const blob = new Blob([rawHtml], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'document.html';
-    link.click();
-    URL.revokeObjectURL(url);
-
-    console.log(datosEstado)
-
+async function DescargaAcuse(estado, datosEstado) {
+    try {
+        // Generate and download PDF using the template
+        const blob = await pdf(<AcusePDF estado={estado} datosEstado={datosEstado} />).toBlob();
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `acuse_${estado}_${new Date().toISOString().split('T')[0]}.pdf`;
+        link.click();
+        URL.revokeObjectURL(url);
+    } catch (error) {
+        console.error('Error generating PDF:', error);
+    }
 }
 
 export default DescargaAcuse;

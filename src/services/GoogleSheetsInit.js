@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import sheetsService from '../../services/sheetsService';
-import { criterios } from '../misc/ListaCriterios';
+import sheetsService from './sheetsService';
+import { criterios } from '../components/misc/ListaCriterios';
 
 const GoogleSheetsInit = ({ 
   selectedState, 

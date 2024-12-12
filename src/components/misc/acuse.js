@@ -98,6 +98,9 @@ const acuse = (estado, datosEstado) => {
 <head>
     <title>Acuse</title>
     <style>
+        body {
+        }
+
         table {
             table-layout: fixed;
             word-break: break-all;
@@ -110,6 +113,7 @@ const acuse = (estado, datosEstado) => {
             height:25px;
             border-bottom: 1px solid #dddddd;
             padding: 8px;
+            font-weight: Light;
         }
         
         th {
@@ -118,10 +122,6 @@ const acuse = (estado, datosEstado) => {
             height:20px;
             text-align: left;
             padding: 8px;
-        }
-        
-        body {
-            font-family: geomanist;
         }
     </style>
 </head>

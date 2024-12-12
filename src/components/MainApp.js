@@ -21,7 +21,7 @@ import Checkboxes from './misc/Checkboxes';
 import { criterios } from './misc/ListaCriterios';
 import Enlaces from './misc/Enlaces';
 import { isValidURL } from './misc/URLCheck';
-import GoogleSheetsInit from './sheets/GoogleSheetsInit';
+import GoogleSheetsInit from '../services/GoogleSheetsInit';
 import sheetsService from '../services/sheetsService';
 import DescargaAcuse from '../services/DescargaAcuse';
 
