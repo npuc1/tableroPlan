@@ -386,16 +386,16 @@ function MainApp() {
 
     try {
 
-      // Prepare complete data for saving
+      // complete data for saving
       const dataToSave = {
-        // Basic tracking data
+        // inst tracking data
         reported: false,
         radioValue: 0,
         normModified: false,
         lastSaved: false,
         editable: false,
 
-        // Add all criterios data
+        // criterios data
         ...Object.fromEntries(
           criterios.map(criterio => [
             `${criterio.accion}${criterio.posicion}`,
@@ -403,7 +403,7 @@ function MainApp() {
           ])
         ),
 
-        // Add normative document data
+        // normative data
         ...Object.fromEntries(
           [1, 2, 3].flatMap(accion => {
             const entries = [
@@ -418,7 +418,7 @@ function MainApp() {
 
       console.log('Generated object:', dataToSave);
 
-      // Save to Google Sheets
+      // save to Sheets
       await sheetsService.saveInstitutionData(selectedState, inst, dataToSave);
 
       // local state update
@@ -531,24 +531,24 @@ function MainApp() {
   // funcion handle save con modificacion normativa
   const handleSaveNormS = async (inst) => {
     try {
-      // Reset states
+      // reset states
 
-      // Validate before saving
+      // validate before saving
       const isValid = validateFormBeforeSave(inst);
       if (!isValid) {
         throw new Error('Por favor complete todos los campos requeridos');
       }
 
-      // Prepare complete data for saving
+      // complete data for saving
       const dataToSave = {
-        // Basic tracking data
+        // inst tracking data
         reported: formData[inst].reported,
         radioValue: formData[inst].radioValue,
         normModified: formData[inst].normModified,
         lastSaved: true,
         editable: false,
 
-        // Add all criterios data
+        // all criterios data
         ...Object.fromEntries(
           criterios.map(criterio => [
             `${criterio.accion}${criterio.posicion}`,
@@ -556,7 +556,7 @@ function MainApp() {
           ])
         ),
 
-        // Add normative document data
+        // normative document data
         ...Object.fromEntries(
           [1, 2, 3].flatMap(accion => [
             [`normName${accion}`, formData[inst][`normName${accion}`] || ''],
@@ -566,10 +566,10 @@ function MainApp() {
         )
       };
 
-      // Save to Google Sheets
+      // save to sheets
       await sheetsService.saveInstitutionData(selectedState, inst, dataToSave);
 
-      // Update local state
+      // update local state
       setFormData(prevData => ({
         ...prevData,
         [inst]: {
@@ -613,14 +613,14 @@ function MainApp() {
         normModified: false,
         lastSaved: true,
         editable: false,
-        // Reset all criterios to false
+        // reset criterios
         ...Object.fromEntries(
           criterios.map(criterio => [
             `${criterio.accion}${criterio.posicion}`,
             false
           ])
         ),
-        // Reset all normative document fields
+        // reset normative fields
         ...Object.fromEntries(
           [1, 2, 3].flatMap(accion => [
             [`normName${accion}`, ''],
@@ -638,7 +638,7 @@ function MainApp() {
           ...prevData[inst],
           lastSaved: true,
           normModified: false,
-          // Reset all related fields
+          // reset all fields
           ...Object.fromEntries(
             criterios.map(criterio => [
               `${criterio.accion}${criterio.posicion}`,

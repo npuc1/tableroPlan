@@ -1,8 +1,7 @@
-// AcusePDF.js
 import React from 'react';
 import { Page, Text, View, Document, StyleSheet, Image, Link } from '@react-pdf/renderer';
 
-// Define styles for PDF layout
+// styles for layout
 const styles = StyleSheet.create({
   page: {
     padding: 30,
@@ -78,23 +77,23 @@ const styles = StyleSheet.create({
 });
 
 function ensureHttps(url) {
-  // If the URL already starts with http:// or https://, return it as is
+  // si la URL empieza con http:// or https://, return it as is
   if (url.match(/^https?:\/\//)) {
     return url;
   }
   
-  // If the URL starts with //, add https:
+  // si empieza con with //, add https:
   if (url.startsWith('//')) {
     return `https:${url}`;
   }
   
-  // If the URL is a relative path or just a domain, add https://
+  // si es un relative path or un dominio, agrega https://
   return `https://${url.replace(/^\/+/, '')}`;
 }
 
-// Create Document Component
+// document component
 const AcusePDF = ({ estado, datosEstado }) => {
-  // Format the current date in Spanish
+  // fecha en español
   const currentDate = new Date().toLocaleDateString('es-MX', {
     year: 'numeric',
     month: 'long',
@@ -104,7 +103,7 @@ const AcusePDF = ({ estado, datosEstado }) => {
     second: '2-digit'
   });
 
-  // Function to render institution section
+  // render institution section
   const renderInstitutionSection = ([sectionName, sectionData]) => {
     const criteriosConsiderados = Object.entries(sectionData)
       .filter(([_, value], index) => value === true && index >= 0 && index <= 11)

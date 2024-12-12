@@ -1,11 +1,10 @@
-// RateLimitModal.js
 import React, { useEffect, useState } from 'react';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import ProgressBar from 'react-bootstrap/ProgressBar';
 
 const RateLimitModal = ({ show, waitTime, onClose }) => {
-  // Initialize timeRemaining when the modal shows or waitTime changes
+  // initialize timeRemaining when the modal shows or waitTime changes
   useEffect(() => {
     if (show) {
       setTimeRemaining(waitTime);
@@ -17,25 +16,24 @@ const RateLimitModal = ({ show, waitTime, onClose }) => {
   useEffect(() => {
     let timer = null;
 
-    // Only start the timer if the modal is shown and we have time remaining
+    // start the timer if the modal is shown and we have time remaining
     if (show && timeRemaining > 0) {
-      // Create an interval that runs every second
+      // intervalo por segundo
       timer = setInterval(() => {
         setTimeRemaining((prevTime) => {
-          // When we reach 0, clear the interval and close the modal
+          // en 0, limpia el intervalo y cierra el modal
           if (prevTime <= 1) {
             clearInterval(timer);
             onClose();
             return 0;
           }
-          // Otherwise, decrease the time by 1 second
+          // else, quita un segundo al intervalo
           return prevTime - 1;
         });
       }, 1000);
     }
 
-    // Cleanup function to clear the interval when the component unmounts
-    // or when dependencies change
+    // cleanup function quita el interval cuando el componente unmounts o si las dependencias cambian
     return () => {
       if (timer) {
         clearInterval(timer);
@@ -43,7 +41,7 @@ const RateLimitModal = ({ show, waitTime, onClose }) => {
     };
   }, [show, onClose, timeRemaining]); // Dependencies that should trigger useEffect
 
-  // Calculate progress for the progress bar (from 0 to 100)
+  // calculate el progreso para la barra (de 0 a 100)
   const progress = Math.max(0, Math.min(100, ((waitTime - timeRemaining) / waitTime) * 100));
 
   return (

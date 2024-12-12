@@ -218,19 +218,19 @@ class SheetsService {
 
       const accessToken = await this.getAccessToken();
       
-      // First, we'll get the current data to find the correct rows to update
+      //current data para encontrar filas para actualizar
       const [trackingData, criteriosData, accionesData] = await Promise.all([
         this.fetchRange('insttracking!A2:G221', accessToken),
         this.fetchRange('criterios!A2:F2641', accessToken),
         this.fetchRange('acciones!A2:F661', accessToken)
       ]);
 
-      // Find row indices for each sheet
+      // row indices por hoja
       const trackingRowIndex = trackingData.values.findIndex(row => 
         row[0] === estado && row[1] === institution
-      ) + 2; // +2 because sheet is 1-based and we skipped header
+      ) + 2; // +2 because sheet is 1-based y skip header
 
-      // Prepare the batch update request
+      // prepare the batch update request
       const requests = [];
 
       // 1. Update tracking data
@@ -247,7 +247,7 @@ class SheetsService {
         ]]
       });
 
-      // 2. Prepare criterios updates
+      // 2. criterios updates
       const criteriosUpdates = [];
       for (const accion of [1, 2, 3]) {
         const criteriosForAccion = Object.entries(data)
@@ -277,7 +277,7 @@ class SheetsService {
         });
       }
 
-      // Find and update existing criterios rows or append new ones
+      // find and update criterios
       const criteriosStartRow = criteriosData.values.findIndex(row => 
         row[0] === estado && row[1] === institution
       ) + 2;
@@ -289,7 +289,7 @@ class SheetsService {
         });
       }
 
-      // 3. Prepare acciones (normative documents) updates
+      // 3. acciones (enlaces a normatividad) updates
       const accionesUpdates = [];
       for (const accion of [1, 2, 3]) {
         accionesUpdates.push([
@@ -309,7 +309,7 @@ class SheetsService {
         ]);
       }
 
-      // Find and update existing acciones rows or append new ones
+      // find and update filas acciones rows o agrega nuevas
       const accionesStartRow = accionesData.values.findIndex(row => 
         row[0] === estado && row[1] === institution
       ) + 2;
@@ -321,7 +321,7 @@ class SheetsService {
         });
       }
 
-      // Execute the batch update
+      // execute batch update
       const batchUpdateResponse = await fetch(
         `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values:batchUpdate`,
         {
@@ -360,18 +360,18 @@ class SheetsService {
 
       const accessToken = await this.getAccessToken();
       
-      // First, find the row for this state in the estados sheet
+      // find the row for this state en hoja estados
       const estadosResponse = await this.fetchRange(RANGES.estados, accessToken);
       const estadosRows = estadosResponse.values || [];
       
-      // Find the row index for this state (add 1 because sheet is 1-based)
+      // row index for this state (add 1 por 1-based)
       const stateRowIndex = estadosRows.findIndex(row => row[0] === state) + 1;
       
       if (stateRowIndex === 0) {
         throw new Error(`State ${state} not found in estados sheet`);
       }
 
-      // Prepare the update request
+      // prepara update request
       const updateRequest = {
         valueInputOption: 'RAW',
         data: [
@@ -393,7 +393,7 @@ class SheetsService {
         ]
       };
 
-      // Make the update request
+      // update request
       const response = await fetch(
         `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values:batchUpdate`,
         {
