@@ -238,7 +238,7 @@ class SheetsService {
       const criteriosUpdates = [];
       for (const accion of [1, 2, 3]) {
         const criteriosForAccion = Object.entries(data)
-          .filter(([key, value]) => key.startsWith(`${accion}`) && key.length === 2)
+          .filter(([key, _]) => key.startsWith(`${accion}`) && key.length === 2)
           .map(([key, value]) => ({
             accion: key.charAt(0),
             criterio: key.charAt(1),
@@ -279,23 +279,21 @@ class SheetsService {
       // 3. Prepare acciones (normative documents) updates
       const accionesUpdates = [];
       for (const accion of [1, 2, 3]) {
-        if (data[`editableText${accion}`] && data[`normName${accion}`]) {
-          accionesUpdates.push([
-            estado,
-            institution,
-            accion.toString(),
-            data[`normLink${accion}`] || '',
-            data[`normName${accion}`] || '',
-            new Date().toLocaleDateString('es-MX', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-              hour: '2-digit',    
-              minute: '2-digit', 
-              second: '2-digit'   
-          })
-          ]);
-        }
+        accionesUpdates.push([
+          estado,
+          institution,
+          accion.toString(),
+          data[`normLink${accion}`] || '',
+          data[`normName${accion}`] || '',
+          new Date().toLocaleDateString('es-MX', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',    
+            minute: '2-digit', 
+            second: '2-digit'   
+        })
+        ]);
       }
 
       // Find and update existing acciones rows or append new ones
@@ -329,6 +327,8 @@ class SheetsService {
       if (!batchUpdateResponse.ok) {
         throw new Error('Failed to update data');
       }
+
+      console.log('Saved data:', data);
 
       return await batchUpdateResponse.json();
 

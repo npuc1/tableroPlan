@@ -377,18 +377,64 @@ function MainApp() {
     console.log('UpdatedFormData', formData);
   };
 
-  const handleNoReport = (institution) => {
-    setMostrarModalNoR(false);
-    setFormData(prevData => ({
-      ...prevData,
-      [institution]: {
-        ...prevData[institution],
+  const handleNoReport = async (inst) => {
+
+    try {
+
+      // Prepare complete data for saving
+      const dataToSave = {
+        // Basic tracking data
         reported: false,
-        radioValue: '0',
-      }
-    }));
-    handleCheckboxRChange(institution, false);
-    console.log('UpdatedFormData', formData);
+        radioValue: 0,
+        normModified: false,
+        lastSaved: false,
+        editable: false,
+
+        // Add all criterios data
+        ...Object.fromEntries(
+          criterios.map(criterio => [
+            `${criterio.accion}${criterio.posicion}`,
+            0
+          ])
+        ),
+
+        // Add normative document data
+        ...Object.fromEntries(
+          [1, 2, 3].flatMap(accion => {
+            const entries = [
+              [`normName${accion}`, ""],
+              [`normLink${accion}`, ""],
+              [`editableText${accion}`, false]
+            ];
+            return entries;
+          })
+        )
+      };
+
+      console.log('Generated object:', dataToSave);
+
+      // Save to Google Sheets
+      await sheetsService.saveInstitutionData(selectedState, inst, dataToSave);
+
+      // local state update
+      setFormData(prevData => ({
+        ...prevData,
+        [inst]: {
+          ...prevData[inst],
+          reported: false,
+          radioValue: '0',
+        }
+      }));
+  
+      setMostrarModalNoR(false);
+  
+      handleCheckboxRChange(inst, false);
+  
+      console.log('UpdatedFormData', formData);
+
+    } catch (error) {
+      console.error('Error saving data:', error);
+    }
   };
 
   // handler timer
