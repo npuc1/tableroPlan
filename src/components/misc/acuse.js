@@ -1,4 +1,6 @@
-const formato = (estado, datosEstado) => {
+const acuse = (estado, datosEstado) => {
+
+    const logoPath = './SNA.png';
 
     // secciona el objeto estatal en secciones por isntitución
     const sectionTables = Object.entries(datosEstado)
@@ -8,7 +10,18 @@ const formato = (estado, datosEstado) => {
                 .filter(([_, value], index) => {
                     return value === true && index >= 0 && index <= 11
                 })
-                .map(([field, _]) => field)
+                .map(([field, _]) => {
+                    return `${field[0]}.${field[1]}`
+                })
+                .join(', ');
+
+            const enlaces = Object.entries(sectionData)
+                .filter(([field, value]) => {
+                    return field.startsWith("normLink") && value !== ""
+                })
+                .map(([field, value]) => {
+                    return `<a href="${value}">Acción 3.${field[8]}</a>`
+                })
                 .join(', ');
 
             if (sectionData.reported) {
@@ -16,22 +29,19 @@ const formato = (estado, datosEstado) => {
                     return `
                             <div class="section">
                                 <table>
-                                    <col width='800px' />
-                                    <col width='150px' />
+                                    <col width='750' />
+                                    <col width='200px' />
                                     <tr>
                                         <th>${sectionName}</th>
                                         <th>Reporte: Sí</th>
-                                        <th class='F'></th>
                                     </tr>
                                     <tr>
-                                        <th>Criterios considerados</th>
-                                        <th>Enlaces</th>
-                                        <th class='F'></th>
+                                        <td>Criterios considerados</td>
+                                        <td>Enlaces</td>
                                     </tr>
                                     <tr>
                                         <td>${criteriosConsiderados}</td>
-                                        <td>Enlaces</td>
-                                        <td class='F'></td>
+                                        <td>${enlaces}</td>
                                     </tr>
                                 </table>
                             </div>
@@ -41,16 +51,14 @@ const formato = (estado, datosEstado) => {
                 return `
                             <div class="section">
                                 <table>
-                                    <col width='800px' />
-                                    <col width='150px' />
+                                    <col width='750' />
+                                    <col width='200px' />
                                     <tr>
                                         <th>${sectionName}</th>
                                         <th>Reporte: Sí</th>
-                                        <th class='F'></th>
                                     </tr>
                                     <tr>
-                                        <th colspan="2">Observación: La normatividad institucional no considera los criterios del Plan de Acción.</th>
-                                        <th class='F'></th>
+                                        <td colspan="2">Observación: La normatividad institucional no considera los criterios del Plan de Acción.</td>
                                     </tr>
                                 </table>
                             </div>
@@ -60,22 +68,19 @@ const formato = (estado, datosEstado) => {
             return `
                             <div class="section">
                                 <table>
-                                    <col width='800px' />
-                                    <col width='150px' />
+                                    <col width='750' />
+                                    <col width='200px' />
                                     <tr>
                                         <th>${sectionName}</th>
                                         <th>Reporte: No</th>
-                                        <th class='F'></th>
                                     </tr>
                                     <tr>
-                                        <th>Criterios considerados</th>
-                                        <th>Enlaces</th>
-                                        <th class='F'></th>
+                                        <td>Criterios considerados</td>
+                                        <td>Enlaces</td>
                                     </tr>
                                     <tr>
                                         <td>NA</td>
                                         <td>NA</td>
-                                        <td class='F'></td>
                                     </tr>
                                 </table>
                             </div>
@@ -97,17 +102,19 @@ const formato = (estado, datosEstado) => {
             table-layout: fixed;
             word-break: break-all;
             border-collapse: collapse;
-            width:100%;
+            width:80%;
+            margin: auto;
         }
 
         td {
             height:25px;
-            border: 1px solid #dddddd;
+            border-bottom: 1px solid #dddddd;
             padding: 8px;
         }
         
         th {
-            border: 1px solid #dddddd;
+            border-top: 2px solid #dddddd;
+            border-bottom: 2px solid #dddddd;
             height:20px;
             text-align: left;
             padding: 8px;
@@ -116,30 +123,29 @@ const formato = (estado, datosEstado) => {
         body {
             font-family: geomanist;
         }
-
-        .F {
-            width:100%;
-            border:none;
-            border-left:1px solid;
-        }
-
-        .section {
-            background-color: yellow;
-        }
     </style>
 </head>
 
 <body>
-    <div style="text-align: right;">
+    <div><img src="${logoPath}" alt="logo SNA"></div>
+    <div style="text-align: right; padding-right: 3%; padding-left: 5%; padding-top: 5%;">
         <h3>ACUSE DE REPORTE DE CUMPLIMIENTO</h3>
         <p>PLAN DE ACCIÓN PARA FORTALECER LOS PROCESOS DE CONTRATACIONES PÚBLICAS EN MATERIA DE ADQUISICIONES,
             ARRENDAMIENTOS Y SERVICIOS DEL SECTOR PÚBLICO</p>
     </div>
-    <div>
-        <p>22/octubre/2024; 14:55:05</p>
+    <div style="padding-left: 3%;">
+        <p> Acuse generado el 
+            ${new Date().toLocaleDateString('es-MX', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',    
+                minute: '2-digit', 
+                second: '2-digit'   
+            })}
+        </p>
     </div>
-    <br>
-    <div>
+    <div style="padding-left: 3%; padding-right: 3%; padding-top: 3%; padding-bottom: 1%; text-align: justify;">
         <h4>Sistema Estatal Anticorrupción de ${estado}</h4>
         <p>La emisión del presente acuse por parte de la Secretaría Ejecutiva del Sistema Nacional Anticorrupción
             atiende al reporte de información en el Tablero de Seguimiento a la Acción 3: “Homologar el marco estatal de
@@ -148,7 +154,6 @@ const formato = (estado, datosEstado) => {
             contrataciones públicas en materia de adquisiciones, arrendamientos y servicios del sector público,
             consistente en los siguientes datos:</p>
     </div>
-    <br>
     <div>
         ${sectionTables}
     </div>
@@ -158,4 +163,4 @@ const formato = (estado, datosEstado) => {
     `;
 };
 
-export default formato;
+export default acuse;
