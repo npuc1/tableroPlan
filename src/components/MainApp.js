@@ -25,6 +25,7 @@ import GoogleSheetsInit from '../services/GoogleSheetsInit';
 import sheetsService from '../services/sheetsService';
 import DescargaAcuse from '../services/DescargaAcuse';
 import NoReportModal from './modals/NoReportModal';
+import RateLimitModal from './modals/RateLimitModal';
 
 let instVisit = [0]
 
@@ -127,6 +128,10 @@ function MainApp() {
   const [mostrarModalNormS, setMostrarModalNormS] = useState(false);
   const [mostrarModalNormN, setMostrarModalNormN] = useState(false);
   const [mostrarModalAcuse, setMostrarModalAcuse] = useState(false);
+  const [rateLimitModal, setRateLimitModal] = useState({
+    show: false,
+    waitTime: 0
+  });
 
   const handleCloseR = () => setMostrarModalR(false); // handle para cerrar al hacer clic, el handle para mostrar viene en la misma función que el guardado
   const handleCloseNoR = () => setMostrarModalNoR(false);
@@ -174,53 +179,53 @@ function MainApp() {
         const propertyName = `${criterio.accion}${criterio.posicion}`; // crea el nombre de la propiedad a partir de criterios (definido anteirormente)
         resetCheckboxes[propertyName] = false; // asigna todas las propiedades con falso al objeto vacío
       });
-      if(manual) {
+      if (manual) {
         const isUnchecking = prevData[institution].normModified; // extrae el estatus actual para verificar que estamos uncheckeando
 
-      return {
-        ...prevData,
-        [institution]: {
-          ...prevData[institution],
-          normModified: !prevData[institution].normModified,
-          editable: !prevData[institution].normModified,
-          ...(isUnchecking && { // si se está modificando, devuelve todos los valores de reset
-            ...resetCheckboxes,
-            normName1: "",
-            normLink1: "",
-            normName2: "",
-            normLink2: "",
-            normName3: "",
-            normLink3: "",
-            editableText1: false,
-            editableText2: false,
-            editableText3: false,
-          })
-        }
-      };
+        return {
+          ...prevData,
+          [institution]: {
+            ...prevData[institution],
+            normModified: !prevData[institution].normModified,
+            editable: !prevData[institution].normModified,
+            ...(isUnchecking && { // si se está modificando, devuelve todos los valores de reset
+              ...resetCheckboxes,
+              normName1: "",
+              normLink1: "",
+              normName2: "",
+              normLink2: "",
+              normName3: "",
+              normLink3: "",
+              editableText1: false,
+              editableText2: false,
+              editableText3: false,
+            })
+          }
+        };
       } else {
         const isUnchecking = true; // always unchecking
 
-      return {
-        ...prevData,
-        [institution]: {
-          ...prevData[institution],
-          normModified: false,
-          editable: false,
-          lastSaved: false,
-          ...(isUnchecking && { // si se está modificando, devuelve todos los valores de reset
-            ...resetCheckboxes,
-            normName1: "",
-            normLink1: "",
-            normName2: "",
-            normLink2: "",
-            normName3: "",
-            normLink3: "",
-            editableText1: false,
-            editableText2: false,
-            editableText3: false,
-          })
-        }
-      };
+        return {
+          ...prevData,
+          [institution]: {
+            ...prevData[institution],
+            normModified: false,
+            editable: false,
+            lastSaved: false,
+            ...(isUnchecking && { // si se está modificando, devuelve todos los valores de reset
+              ...resetCheckboxes,
+              normName1: "",
+              normLink1: "",
+              normName2: "",
+              normLink2: "",
+              normName3: "",
+              normLink3: "",
+              editableText1: false,
+              editableText2: false,
+              editableText3: false,
+            })
+          }
+        };
       }
     });
 
@@ -425,14 +430,22 @@ function MainApp() {
           radioValue: '0',
         }
       }));
-  
+
       setMostrarModalNoR(false);
-  
+
       handleCheckboxRChange(inst, false);
-  
+
       console.log('UpdatedFormData', formData);
 
     } catch (error) {
+      if (error.message.startsWith('Por favor espere')) {
+        const waitTime = parseInt(error.message.match(/\d+/)[0]);
+        setRateLimitModal({
+          show: true,
+          waitTime: waitTime
+        });
+        return;
+      }
       console.error('Error saving data:', error);
     }
   };
@@ -569,6 +582,14 @@ function MainApp() {
       setMostrarModalNormS(false);
 
     } catch (error) {
+      if (error.message.startsWith('Por favor espere')) {
+        const waitTime = parseInt(error.message.match(/\d+/)[0]);
+        setRateLimitModal({
+          show: true,
+          waitTime: waitTime
+        });
+        return;
+      }
       console.error('Error saving data:', error);
     }
   };
@@ -713,6 +734,12 @@ function MainApp() {
             onClose={() => handleCloseNormN()}
             onConfirm={handleSaveNormN}
             institutionName={nameInst(currentInstIndex)}
+          />
+
+          <RateLimitModal
+            show={rateLimitModal.show}
+            waitTime={rateLimitModal.waitTime}
+            onClose={() => setRateLimitModal({ show: false, waitTime: 0 })}
           />
 
           <Modal

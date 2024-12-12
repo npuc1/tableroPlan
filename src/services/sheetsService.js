@@ -1,5 +1,6 @@
 import KJUR from 'jsrsasign';
 import credentials from '../config/credentials.json';
+import rateLimiter from './rateLimiterService'
 
 const SPREADSHEET_ID = process.env.REACT_APP_GOOGLE_SPREADSHEET_ID;
 
@@ -57,7 +58,15 @@ class SheetsService {
     return access_token;
   }
 
+  async checkRateLimitAndWait() {
+    const waitTime = await rateLimiter.checkRateLimit();
+    if (waitTime > 0) {
+      throw new Error(`RATE_LIMIT:${waitTime}`);
+    }
+  }
+
   async fetchRange(range, accessToken) {
+    await this.checkRateLimitAndWait();
     const response = await fetch(
       `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${range}`,
       {
@@ -79,6 +88,7 @@ class SheetsService {
 
   async fetchAllData(estado) {
     try {
+      await this.checkRateLimitAndWait();
       console.log('Fetching data for state:', estado);
       const accessToken = await this.getAccessToken();
       
@@ -166,6 +176,7 @@ class SheetsService {
 
   async getAllStates() {
     try {
+      await this.checkRateLimitAndWait();
       const accessToken = await this.getAccessToken();
       const response = await fetch(
         `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${RANGES.estados}`,
@@ -203,6 +214,8 @@ class SheetsService {
 
   async saveInstitutionData(estado, institution, data) {
     try {
+      await this.checkRateLimitAndWait();
+
       const accessToken = await this.getAccessToken();
       
       // First, we'll get the current data to find the correct rows to update
@@ -333,13 +346,18 @@ class SheetsService {
       return await batchUpdateResponse.json();
 
     } catch (error) {
-      console.error('Error saving complete institution data:', error);
+      if (error.message.startsWith('RATE_LIMIT:')) {
+        const waitTime = parseInt(error.message.split(':')[1]);
+        throw new Error(`Por favor espere ${waitTime} segundos antes de continuar.`);
+      }
       throw error;
     }
   }
 
   async updateAcuseStatus(state) {
     try {
+      await this.checkRateLimitAndWait();
+
       const accessToken = await this.getAccessToken();
       
       // First, find the row for this state in the estados sheet
