@@ -252,7 +252,14 @@ class SheetsService {
             criterio.accion,
             criterio.criterio,
             criterio.modificado ? '1' : '0',
-            new Date().toISOString()
+            new Date().toLocaleDateString('es-MX', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+              hour: '2-digit',    
+              minute: '2-digit', 
+              second: '2-digit'   
+          })
           ]);
         });
       }
@@ -279,7 +286,14 @@ class SheetsService {
             accion.toString(),
             data[`normLink${accion}`] || '',
             data[`normName${accion}`] || '',
-            new Date().toISOString()
+            new Date().toLocaleDateString('es-MX', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+              hour: '2-digit',    
+              minute: '2-digit', 
+              second: '2-digit'   
+          })
           ]);
         }
       }
@@ -342,10 +356,23 @@ class SheetsService {
       // Prepare the update request
       const updateRequest = {
         valueInputOption: 'RAW',
-        data: [{
-          range: `estados!C${stateRowIndex}`,  // Column C for acuseEmitido
-          values: [['1']]  // Update to 1 to indicate acuse was generated
-        }]
+        data: [
+          {
+            range: `estados!C${stateRowIndex}`,  
+            values: [['1']] 
+          },
+          {
+            range: `estados!D${stateRowIndex}`,
+            values: [[new Date().toLocaleDateString('es-MX', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+              hour: '2-digit',    
+              minute: '2-digit', 
+              second: '2-digit'   
+          })]] 
+          }
+        ]
       };
 
       // Make the update request

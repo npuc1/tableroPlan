@@ -1,16 +1,20 @@
-function DescargaAcuse() {
-    // Create a link element - think of this as creating an invisible download button
-    const link = document.createElement('a');
-    
-    // Set the file path - this is the same as before
-    link.href = '/acuse-quintana-roo.pdf';
-    
-    // This is the key difference - the 'download' attribute tells the browser
-    // to download the file instead of navigating to it
-    link.download = 'acuse-quintana-roo.pdf';
-    
-    // Programmatically click our invisible download link
-    link.click();
+// DescargaAcuse.js
+import { pdf } from '@react-pdf/renderer';
+import AcusePDF from './AcusePDF';
+
+async function DescargaAcuse(estado, datosEstado) {
+    try {
+        // Generate and download PDF using the template
+        const blob = await pdf(<AcusePDF estado={estado} datosEstado={datosEstado} />).toBlob();
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `acuse_${estado}_${new Date().toISOString().split('T')[0]}.pdf`;
+        link.click();
+        URL.revokeObjectURL(url);
+    } catch (error) {
+        console.error('Error generating PDF:', error);
+    }
 }
 
 export default DescargaAcuse;

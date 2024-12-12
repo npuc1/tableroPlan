@@ -21,7 +21,7 @@ import Checkboxes from './misc/Checkboxes';
 import { criterios } from './misc/ListaCriterios';
 import Enlaces from './misc/Enlaces';
 import { isValidURL } from './misc/URLCheck';
-import GoogleSheetsInit from './sheets/GoogleSheetsInit';
+import GoogleSheetsInit from '../services/GoogleSheetsInit';
 import sheetsService from '../services/sheetsService';
 import DescargaAcuse from '../services/DescargaAcuse';
 
@@ -376,7 +376,7 @@ function MainApp() {
       }
     }));
 
-    DescargaAcuse()
+    DescargaAcuse(selectedState, formData)
 
   };
 
@@ -871,7 +871,7 @@ function MainApp() {
                   <div style={{ 'paddingTop': '20px', 'display': 'flex', 'justifyContent': 'center', }}>
                     <Button
                     variant='warning'
-                    onClick={() => DescargaAcuse()}>Descargar acuse
+                    onClick={() => DescargaAcuse(selectedState, formData)}>Descargar acuse
                     </Button></div>
                 </Card.Text>
               </Card.Body>
