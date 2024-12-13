@@ -32,7 +32,7 @@ const Header = ({
             target="_blank"
             rel="noopener noreferrer">
             <img
-              src="/logo-SNA.svg"
+              src="./logo-SNA.svg"
               alt="Sistema Nacional Anticorrupción"
               style={{ 'width': '300px', 'height': 'auto' }} />
           </a>

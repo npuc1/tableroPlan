@@ -1,0 +1,36 @@
+import React, { useState } from 'react';
+import { Button } from 'react-bootstrap';
+
+const DisabledButton = ({ 
+  onClick, 
+  children, 
+  variant = 'primary',
+  className = '',
+  disabled = false
+}) => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleClick = async () => {
+    if (isLoading) return;
+
+    setIsLoading(true);
+    try {
+      await onClick();
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <Button
+      variant={variant}
+      className={className}
+      onClick={handleClick}
+      disabled={isLoading || disabled}
+    >
+      {isLoading ? 'Processing...' : children}
+    </Button>
+  );
+};
+
+export default DisabledButton;
