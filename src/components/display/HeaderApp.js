@@ -57,12 +57,12 @@ const Header = ({
           </Button>
           <Button 
           variant='secondary'
-          onClick={() => DescargaDoc('/Guía Plan de Acción_SEA.pdf')}>
+          onClick={() => DescargaDoc('./Guía Plan de Acción_SEA.pdf')}>
             Guía de la Acción 3 <BsCloudDownload />
           </Button>
           <Button 
           variant='secondary'
-          onClick={() => DescargaDoc('/Manual de usuario - Tablero.pdf')}>
+          onClick={() => DescargaDoc('./Manual de usuario - Tablero.pdf')}>
             Manual de usuario <BsCloudDownload />
           </Button>
           {(isAuthenticated && appMetadata.rol === "admin") && <Dropdown>

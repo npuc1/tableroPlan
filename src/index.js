@@ -17,7 +17,7 @@ root.render(
       domain={process.env.REACT_APP_DOMAIN}
       clientId={process.env.REACT_APP_CLIENTID}
       authorizationParams={{
-        redirect_uri: window.location.origin,
+        redirect_uri: `${window.location.origin}/tablero-de-reporte/`,
         response_type: "code"
       }}
       useRefreshTokens={true}
